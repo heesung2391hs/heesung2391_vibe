@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ 우당탕탕 나의 MBTI 캐릭터 찾기 ✨</title>
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --bg-color: #f8f9fa;
+            --text-color: #2d3436;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        /* 공통 버튼 */
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            background-color: #5b4cc4;
+        }
+
+        /* 화면 전환 효과 */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* 시작 페이지 */
+        .start-img { font-size: 80px; margin-bottom: 20px; }
+        h1 { font-size: 28px; color: var(--primary-color); margin-bottom: 10px; }
+        
+        /* 질문 페이지 */
+        .progress-bar {
+            background-color: #e9ecef;
+            border-radius: 10px;
+            height: 10px;
+            width: 100%;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .progress {
+            background-color: var(--primary-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .question-text {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            word-break: keep-all;
+            line-height: 1.4;
+        }
+        .answer-btn {
+            background-color: #f1f2f6;
+            color: var(--text-color);
+            text-align: left;
+            padding: 20px;
+            border: 2px solid transparent;
+        }
+        .answer-btn:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        /* 결과 페이지 */
+        .result-emoji { font-size: 90px; margin: 20px 0; animation: bounce 1s infinite alternate; }
+        .result-mbti { font-size: 32px; font-weight: bold; color: var(--primary-color); }
+        .result-title { font-size: 20px; color: #666; margin-bottom: 30px; }
+        
+        .box-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            border-top: 4px solid var(--primary-color);
+        }
+        .box.bad { border-top-color: #ff7675; }
+        .box h3 { margin-top: 0; font-size: 16px; display: flex; align-items: center; gap: 5px; }
+        .box ul { padding-left: 20px; margin: 0; font-size: 14px; color: #444; line-height: 1.6; }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 1. 시작 화면 -->
+        <div id="start-page" class="page active">
+            <div class="start-img">🔮</div>
+            <h1>나의 우당탕탕 캐릭터 찾기</h1>
+            <p style="color: #777; margin-bottom: 30px;">딱 32개의 질문으로 알아보는 나의 대환장 MBTI 성격 유형!</p>
+            <button onclick="startTest()">테스트 시작하기 🚀</button>
+        </div>
+
+        <!-- 2. 질문 화면 -->
+        <div id="question-page" class="page">
+            <div class="progress-bar"><div id="progress" class="progress"></div></div>
+            <div id="question-text" class="question-text">질문 텍스트</div>
+            <button id="answer-a" class="answer-btn" onclick="selectAnswer('A')">답변 A</button>
+            <button id="answer-b" class="answer-btn" onclick="selectAnswer('B')">답변 B</button>
+        </div>
+
+        <!-- 3. 결과 화면 -->
+        <div id="result-page" class="page">
+            <div id="result-emoji" class="result-emoji">🦊</div>
+            <div id="result-mbti" class="result-mbti">ESTP</div>
+            <div id="result-title" class="result-title">인생은 한 번뿐인 스릴러</div>
+            
+            <div class="box-container">
+                <div class="box">
+                    <h3>💪 무조건적인 장점</h3>
+                    <ul id="result-pros"></ul>
+                </div>
+                <div class="box bad">
+                    <h3>주의 요망 단점</h3>
+                    <ul id="result-cons"></ul>
+                </div>
+            </div>
+
+            <button onclick="restartTest()">다시 테스트하기 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        // 32가지 질문 데이터 (E/I, S/N, T/F, J/P 각 8문항씩)
+        const questions = [
+            // 1~8: E vs I
+            { q: "주말에 에너지를 충전하는 나만의 방식은?", a: "친구들과 만나 수다 떨며 스트레스 풀기", b: "이불 속에서 넷플릭스 보며 혼자만의 시간 갖기", type: "EI" },
+            { q: "새로운 모임에 갔을 때 나의 행동은?", a: "먼저 말을 걸며 분위기를 주도한다", b: "조용히 눈치를 보며 다가오는 사람과 대화한다", type: "EI" },
+            { q: "팀 프로젝트를 할 때 내가 선호하는 역할은?", a: "말을 많이 하고 회의를 이끄는 발표자", b: "묵묵히 자료를 조사하고 정리하는 조력자", type: "EI" },
+            { q: "기분이 울적할 때 생각나는 것은?", a: "밖으로 나가서 사람들을 만나고 싶다", b: "혼자 방에서 조용히 음악을 듣고 싶다", type: "EI" },
+            { q: "전화 통화와 문자 메시지 중 편한 것은?", a: "용건이 있으면 바로 전화하는 게 편함", b: "메시지로 미리 생각하고 보내는 게 편함", type: "EI" },
+            { q: "여러 사람 앞에서 주목받는 상황이 생기면?", a: "내심 즐기며 은근히 신난다", b: "몸이 굳고 빨리 탈출하고 싶어진다", type: "EI" },
+            { q: "처음 본 사람과 친해지는 속도는?", a: "5분만 얘기해도 절친 가능", b: "몇 번은 만나야 서서히 마음을 엶", type: "EI" },
+            { q: "지나가다 아는 사람을 우연히 발견했다면?", a: "반갑게 아는 척하며 다가간다", b: "못 본 척 스쳐 지나가거나 도망친다", type: "EI" },
+
+            // 9~16: S vs N
+            { q: "영화나 소설을 볼 때 내가 더 몰입하는 부분은?", a: "현실감 넘치고 짜임새 있는 스토리", b: "상상력을 자극하는 독특한 세계관과 은유", type: "SN" },
+            { q: "사과 한 개를 보고 드는 생각은?", a: "아삭아삭하고 맛있겠다, 빨갛다", b: "뉴턴의 만유인력... 백설공주... 애플 스마트폰...?", type: "SN" },
+            { q: "길을 찾을 때 내가 의존하는 것은?", a: "지도 앱의 실제 건물 거리뷰와 나침반", b: "대략적인 방향 감각과 '이쯤 가다 보면 나오겠지'라는 느낌", type: "SN" },
+            { q: "새로운 가전제품을 샀을 때 나는?", a: "설명서를 처음부터 꼼꼼히 읽어본다", b: "일단 전원부터 켜고 이것저것 눌러본다", type: "SN" },
+            { q: "친구가 '나 요즘 멍 때리는 시간이 많아졌어'라고 한다면?", a: "'무슨 생각 해?'라고 물어본다", b: "'아무 생각 안 하는 거지?'라며 공감한다", type: "SN" },
+            { q: "요리를 할 때 나의 스타일은?", a: "레시피의 정량(g, 스푼)을 정확히 지킨다", b: "감으로 양념을 대충 털어 넣으며 간을 본다", type: "SN" },
+            { q: "만약 내일 당장 로또 1등에 당첨된다면?", a: "세금 계산과 은행 예금 이율을 알아본다", b: "당첨금을 타러 갈 때 변장할 옷부터 상상한다", type: "SN" },
+            { q: "시험 공부를 할 때 나의 방식은?", a: "교과서 위주로 개념을 암기하고 문제를 푼다", b: "전체적인 흐름과 원리를 이해하려 노력한다", type: "SN" },
+
+            // 17~24: T vs F
+            { q: "친구가 열심히 준비한 시험에서 떨어졌다고 울 때 나의 반응은?", a: "'어떤 과목이 어려웠어? 다음 시험은 언제야?'", b: "'아이고 속상해라ㅠㅠ 진짜 고생 많았는데 어떡해...'", type: "TF" },
+            { q: "대화할 때 내가 더 중요하게 생각하는 것은?", a: "정확한 사실 관계와 논리적인 대화", b: "상대방의 기분과 대화의 부드러운 분위기", type: "TF" },
+            { q: "친구가 미용실에서 머리를 망쳤다며 속상해할 때 내 대답은?", a: "'머리 어디가 망쳤는데? 다시 해달라고 해!'", b: "'에이 그래도 괜찮은데 속상하겠다ㅠㅠ 금방 자랄 거야'", type: "TF" },
+            { q: "칭찬을 들을 때 더 기분 좋은 말은?", a: "너 진짜 일 잘한다, 똑똑하다", b: "너랑 있으면 마음이 편해, 착하다", type: "TF" },
+            { q: "다른 사람과 의견 충돌이 생겼을 때 나는?", a: "누구 말이 옳고 그른지 끝까지 따져본다", b: "관계가 서먹해질까 봐 적당히 양보하고 타협한다", type: "TF" },
+            { q: "영화를 보다가 슬픈 장면이 나오면?", a: "눈물이 날 수도 있지만 슬픈 원인을 분석함", b: "주인공에 완벽 빙의해서 폭풍 눈물을 흘림", type: "TF" },
+            { q: "누군가 나에게 조언을 구하면 나는?", a: "해결 방안과 팩폭을 날려준다", b: "열심히 위로해 주고 편을 들어준다", type: "TF" },
+            { q: "잘못을 지적당했을 때 드는 생각은?", a: "지적받은 내용이 맞는지 틀린지 판단함", b: "나를 싫어해서 저렇게 말하는 건지 기분 상함", type: "TF" },
+
+            // 25~32: J vs P
+            { q: "여행을 떠나기 전, 나의 계획 수준은?", a: "시간별 동선, 맛집 리스트, 플랜B까지 완벽 준비", b: "비행기 표랑 숙소만 예약하고 발길 닿는 대로", type: "JP" },
+            { q: "과제나 업무 마감일이 다가올 때 나의 행동은?", a: "미리미리 매일 조금씩 나눠서 끝낸다", b: "벼락치기가 진정한 효율! 마감 직전 초사이언 모드", type: "JP" },
+            { q: "내 방 책상이나 서랍의 상태는?", a: "물건들이 제자리에 정리정돈 잘 되어 있음", b: "자유로운 어지러움 속에 나만 아는 규칙이 있음", type: "JP" },
+            { q: "약속 시간이 정해졌을 때 나는?", a: "늦지 않게 교통상황까지 고려해 미리 출발함", b: "시간 딱 맞춰 가거나 꼭 5~10분씩 늦음", type: "JP" },
+            { q: "갑작스러운 번개 모임 제안이 들어온다면?", a: "미리 짜둔 오늘 일정이 꼬여서 부담스럽다", b: "오히려 좋아! 재밌겠다며 바로 달려 나간다", type: "JP" },
+            { q: "해야 할 일(ToDo List)을 적을 때 나는?", a: "체크리스트를 지워가는 쾌감을 즐김", b: "적어만 두고 리스트 존재 자체를 까먹음", type: "JP" },
+            { q: "마트에 장을 보러 갈 때 나의 모습은?", a: "살 물건 목록을 미리 적어서 그것만 사 옴", b: "구경하다가 맛있어 보이고 세일하는 거 다 담음", type: "JP" },
+            { q: "하루 일과를 마칠 때 나는?", a: "오늘 계획한 일을 다 끝냈는지 확인해 봄", b: "오늘 하루도 무사히 흘러갔음에 만족함", type: "JP" }
+        ];
+
+        // 16가지 MBTI 결과 데이터
+        const mbtiResults = {
+            ISTJ: { emoji: "🐨", title: "걸어 다니는 인간 법전", pros: ["강한 책임감", "완벽한 시간 약속", "정확한 일 처리"], cons: ["융통성 제로", "변화를 극도로 싫어함", "은근히 꼰대 기질"] },
+            ISFJ: { emoji: "🐹", title: "방구석 요정 보디가드", pros: ["엄청난 배려심", "주변 사람 잘 챙김", "기억력 천재"], cons: ["거절 못 해서 독박 씀", "혼자 속으로 끙끙 앓음", "서운함 잘 쌓임"] },
+            INFJ: { emoji: "🦉", title: "우주 최고 속을 알 수 없는 선지자", pros: ["깊은 통찰력", "높은 공감 능력", "이상적인 도덕성"], cons: ["생각이 너무 많아 불면증", "인간관계 '손절' 장인", "완벽주의 스트레스"] },
+            INTJ: { emoji: "🦅", title: "인간 냉장고 속 지략가", pros: ["냉철한 분석력", "독립적이고 스마트함", "목표 달성 괴물"], cons: ["사람 성격 분석하려 듦", "감정 공감 능력 상실", "자기가 제일 똑똑한 줄 앎"] },
+            ISTP: { emoji: "🐯", title: "효율성 극대화 귀차니즘 만렙", pros: ["강심장과 대범함", "뛰어난 위기 대처", "손재주가 좋음"], cons: ["연락 두절 잠수왕", "만사 귀찮음", "영혼 없는 리액션"] },
+            ISFP: { emoji: "🐱", title: "침대와 물아일체 예술가", pros: ["따뜻하고 온화함", "미적 감각 뛰어남", "갈등을 싫어하는 평화주의자"], cons: ["미루기 끝판왕", "유리 멘탈", "결정 장애"] },
+            INFP: { emoji: "🐰", title: "망상과 감성 폭발 민들레", pros: ["풍부한 상상력", "따뜻한 공감 능력", "나만의 뚜렷한 가치관"], cons: ["유리쿠션 멘탈", "시작은 거창하나 끝은 흐지부지", "혼자만의 오해 장인"] },
+            INTP: { emoji: "🧠", title: "방구석 아인슈타인", pros: ["논리적 분석왕", "창의적 아이디어 넘침", "편견이 없음"], cons: ["말투가 은근 시비조", "사회성 부족", "행동은 안 하고 구상만 함"] },
+            ESTP: { emoji: "🦊", title: "인생은 한 번뿐인 스릴러", pros: ["넘치는 자신감", "지루할 틈 없는 유머", "현실 감각 최고"], cons: ["충동 조절 장치 고장", "말보다 몸이 먼저 나감", "끈기 부족 깊이 없음"] },
+            ESFP: { emoji: "🦁", title: "본투비 핵인싸 슈퍼스타", pros: ["사교성 우주 최고", "분위기 메이커", "인생을 즐길 줄 앎"], cons: ["소비 요정 지갑 멸망", "진지한 대화 거부", "쉽게 싫증 냄"] },
+            ENFP: { emoji: "🐶", title: "흥 넘치는 리액션 로봇", pros: ["에너자이저 급 활력", "풍부한 리액션", "친화력 대왕"], cons: ["주의 산만 금사빠", "감정 기복 롤러코스터", "계획이란 단어 모름"] },
+            ENTP: { emoji: "🦄", title: "말싸움 지면 잠 못 자는 프로 반박러", pros: ["두뇌 회전 빠름", "말발 우주 최강", "자신감 만렙"], cons: ["모든 대화의 토론화", "끈기 부족", "은근히 시비 거는 악마의 대변인"] },
+            ESTJ: { emoji: "🐻", title: "지옥에서 온 효율 중독 지휘관", pros: ["조직 관리 신", "강한 실행력", "화끈하고 솔직함"], cons: ["위로 대신 팩트 폭행", "지적질 대왕", "계획대로 안 되면 폭발"] },
+            ESFJ: { emoji: "🦌", title: "오지랖 넓은 마당발 보안관", pros: ["엄청난 친절함", "조직의 활력소", "기억력 최고"], cons: ["인정 욕구 과다", "남의 눈치 엄청 봄", "거절하면 상처받음"] },
+            ENFJ: { emoji: "🦚", title: "온 우주를 구하려는 열정 리더", pros: ["타인을 이끄는 리더십", "긍정 파워 넘침", "타인의 성장을 도움"], cons: ["과도한 오지랖", "남의 비판에 개개인 상처", "감정 과몰입"] },
+            ENTJ: { emoji: "🦁", title: "야망 넘치는 폭군 CEO", pros: ["압도적인 리더십", "철저한 목표 지향", "위기를 기회로 만듦"], cons: ["부하직원 피 말리는 스타일", "공감 능력 제로", "자존심 지상 최강"] }
+        };
+
+        let currentIdx = 0;
+        let score = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+
+        function startTest() {
+            document.getElementById("start-page").classList.remove("active");
+            document.getElementById("question-page").classList.add("active");
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentIdx >= questions.length) {
+                showResult();
+                return;
+            }
+            // 진행도 바 업데이트
+            const progress = (currentIdx / questions.length) * 100;
+            document.getElementById("progress").style.width = progress + "%";
+
+            // 질문 및 답변 세팅
+            const currentQ = questions[currentIdx];
+            document.getElementById("question-text").innerText = `Q${currentIdx + 1}. ${currentQ.q}`;
+            document.getElementById("answer-a").innerText = currentQ.a;
+            document.getElementById("answer-b").innerText = currentQ.b;
+        }
+
+        function selectAnswer(choice) {
+            const currentQ = questions[currentIdx];
+            const type = currentQ.type; // "EI", "SN", "TF", "JP"
+
+            if (choice === 'A') {
+                score[type[0]]++;
+            } else {
+                score[type[1]]++;
+            }
+
+            currentIdx++;
+            showQuestion();
+        }
+
+        function showResult() {
+            document.getElementById("question-page").classList.remove("active");
+            document.getElementById("result-page").classList.add("active");
+
+            // 점수 계산하여 MBTI 문자열 조합
+            let mbti = "";
+            mbti += (score.E >= score.I) ? "E" : "I";
+            mbti += (score.S >= score.N) ? "S" : "N";
+            mbti += (score.T >= score.F) ? "T" : "F";
+            mbti += (score.J >= score.P) ? "J" : "P";
+
+            const result = mbtiResults[mbti];
+
+            // 화면에 렌더링
+            document.getElementById("result-emoji").innerText = result.emoji;
+            document.getElementById("result-mbti").innerText = mbti;
+            document.getElementById("result-title").innerText = result.title;
+
+            // 장점 바인딩
+            const prosUl = document.getElementById("result-pros");
+            prosUl.innerHTML = "";
+            result.pros.forEach(pro => {
+                const li = document.createElement("li");
+                li.innerText = pro;
+                prosUl.appendChild(li);
+            });
+
+            // 단점 바인딩
+            const consUl = document.getElementById("result-cons");
+            consUl.innerHTML = "";
+            result.cons.forEach(con => {
+                const li = document.createElement("li");
+                li.innerText = con;
+                consUl.appendChild(li);
+            });
+        }
+
+        function restartTest() {
+            currentIdx = 0;
+            score = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            document.getElementById("result-page").classList.remove("active");
+            document.getElementById("start-page").classList.add("active");
+        }
+    </script>
+</body>
+</html>
