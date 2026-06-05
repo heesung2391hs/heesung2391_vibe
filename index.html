@@ -3,313 +3,1020 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 우당탕탕 나의 MBTI 캐릭터 찾기 ✨</title>
-    <style>
-        :root {
-            --primary-color: #6c5ce7;
-            --secondary-color: #a29bfe;
-            --bg-color: #f8f9fa;
-            --text-color: #2d3436;
+    <title>Premium MBTI Personality Analytics</title>
+    <!-- Tailwind CSS & Google Fonts & FontAwesome CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Pretendard', '-apple-system', 'sans-serif'],
+                        title: ['Plus Jakarta Sans', 'Pretendard', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            900: '#4c1d95',
+                        },
+                        accent: {
+                            emerald: '#10b981',
+                            rose: '#f43f5e',
+                            amber: '#f59e0b',
+                        }
+                    }
+                }
+            }
         }
-
+    </script>
+    <style>
         body {
-            font-family: 'Pretendard', -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: radial-gradient(circle at top right, #1e1b4b 0%, #0f172a 100%);
             min-height: 100vh;
         }
-
-        .container {
-            width: 100%;
-            max-width: 600px;
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            text-align: center;
-            box-sizing: border-box;
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-
-        /* 공통 버튼 */
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            width: 100%;
-            margin-top: 15px;
+        .progress-transition {
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        button:hover {
-            transform: translateY(-2px);
-            background-color: #5b4cc4;
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
         }
-
-        /* 화면 전환 효과 */
-        .page { display: none; }
-        .page.active { display: block; }
-
-        /* 시작 페이지 */
-        .start-img { font-size: 80px; margin-bottom: 20px; }
-        h1 { font-size: 28px; color: var(--primary-color); margin-bottom: 10px; }
-        
-        /* 질문 페이지 */
-        .progress-bar {
-            background-color: #e9ecef;
-            border-radius: 10px;
-            height: 10px;
-            width: 100%;
-            margin-bottom: 30px;
-            overflow: hidden;
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
         }
-        .progress {
-            background-color: var(--primary-color);
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s ease;
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
         }
-        .question-text {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 40px;
-            word-break: keep-all;
-            line-height: 1.4;
-        }
-        .answer-btn {
-            background-color: #f1f2f6;
-            color: var(--text-color);
-            text-align: left;
-            padding: 20px;
-            border: 2px solid transparent;
-        }
-        .answer-btn:hover {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-
-        /* 결과 페이지 */
-        .result-emoji { font-size: 90px; margin: 20px 0; animation: bounce 1s infinite alternate; }
-        .result-mbti { font-size: 32px; font-weight: bold; color: var(--primary-color); }
-        .result-title { font-size: 20px; color: #666; margin-bottom: 30px; }
-        
-        .box-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            text-align: left;
-            margin-bottom: 20px;
-        }
-        .box {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 12px;
-            border-top: 4px solid var(--primary-color);
-        }
-        .box.bad { border-top-color: #ff7675; }
-        .box h3 { margin-top: 0; font-size: 16px; display: flex; align-items: center; gap: 5px; }
-        .box ul { padding-left: 20px; margin: 0; font-size: 14px; color: #444; line-height: 1.6; }
-
-        @keyframes bounce {
-            from { transform: translateY(0); }
-            to { transform: translateY(-10px); }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 92, 246, 0.5);
         }
     </style>
 </head>
-<body>
+<body class="text-slate-100 font-sans selection:bg-brand-500 selection:text-white">
 
-    <div class="container">
-        <!-- 1. 시작 화면 -->
-        <div id="start-page" class="page active">
-            <div class="start-img">🔮</div>
-            <h1>나의 우당탕탕 캐릭터 찾기</h1>
-            <p style="color: #777; margin-bottom: 30px;">딱 32개의 질문으로 알아보는 나의 대환장 MBTI 성격 유형!</p>
-            <button onclick="startTest()">테스트 시작하기 🚀</button>
-        </div>
-
-        <!-- 2. 질문 화면 -->
-        <div id="question-page" class="page">
-            <div class="progress-bar"><div id="progress" class="progress"></div></div>
-            <div id="question-text" class="question-text">질문 텍스트</div>
-            <button id="answer-a" class="answer-btn" onclick="selectAnswer('A')">답변 A</button>
-            <button id="answer-b" class="answer-btn" onclick="selectAnswer('B')">답변 B</button>
-        </div>
-
-        <!-- 3. 결과 화면 -->
-        <div id="result-page" class="page">
-            <div id="result-emoji" class="result-emoji">🦊</div>
-            <div id="result-mbti" class="result-mbti">ESTP</div>
-            <div id="result-title" class="result-title">인생은 한 번뿐인 스릴러</div>
-            
-            <div class="box-container">
-                <div class="box">
-                    <h3>💪 무조건적인 장점</h3>
-                    <ul id="result-pros"></ul>
+    <div class="min-h-vh flex flex-col justify-between p-4 md:p-8 max-w-5xl mx-auto w-full">
+        <!-- Header -->
+        <header class="flex justify-between items-center py-4 border-b border-slate-800/60 mb-6">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid fa-brain text-white text-lg"></i>
                 </div>
-                <div class="box bad">
-                    <h3>주의 요망 단점</h3>
-                    <ul id="result-cons"></ul>
+                <div>
+                    <span class="font-title font-bold text-lg bg-gradient-to-r from-brand-100 to-slate-100 bg-clip-text text-transparent">M-Profile</span>
+                    <span class="text-xs block text-slate-400 font-semibold tracking-wider">OFFICIAL TEST v1.2</span>
                 </div>
             </div>
+            <div class="text-xs px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/50 text-slate-300 font-medium flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-accent-emerald animate-pulse"></span> 정밀 분석 서버 작동 중
+            </div>
+        </header>
 
-            <button onclick="restartTest()">다시 테스트하기 🔄</button>
-        </div>
+        <!-- Main Workspace -->
+        <main class="flex-grow flex flex-col justify-center my-4">
+            
+            <!-- 1. Welcome Screen -->
+            <section id="welcome-screen" class="glass-panel rounded-3xl p-6 md:p-12 text-center shadow-2xl relative overflow-hidden transition-all duration-300">
+                <div class="absolute -top-24 -left-24 w-64 h-64 bg-brand-600/10 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl"></div>
+
+                <div class="max-w-2xl mx-auto space-y-6 relative z-10">
+                    <span class="px-4 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-300 text-xs font-bold uppercase tracking-widest inline-block">Professional Personality Profile</span>
+                    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight bg-gradient-to-b from-white to-slate-300 bg-clip-text text-transparent font-title">
+                        당신의 내면적 잠재력과<br><span class="bg-gradient-to-r from-brand-400 to-indigo-400 bg-clip-text text-transparent">성격 메커니즘</span>을 정교하게 진단합니다
+                    </h1>
+                    <p class="text-slate-400 text-sm md:text-base leading-relaxed">
+                        융(Jung)의 분석심리학적 심리유형론을 기반으로 고안된 32개의 정교한 상황적 질문을 통해, 당신만의 고유한 선호 지표와 복합적인 강·약점, 심층 자아 성장 전략을 체계적으로 도출해 드립니다.
+                    </p>
+
+                    <!-- Info Badges -->
+                    <div class="grid grid-cols-3 gap-3 pt-4 text-center">
+                        <div class="p-3 rounded-2xl bg-slate-800/40 border border-slate-700/30">
+                            <i class="fa-solid fa-clipboard-question text-brand-400 text-lg mb-1 block"></i>
+                            <span class="text-xs text-slate-400 block">진단 문항</span>
+                            <span class="font-bold text-sm text-slate-200">32 정밀 상황</span>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-slate-800/40 border border-slate-700/30">
+                            <i class="fa-solid fa-clock text-indigo-400 text-lg mb-1 block"></i>
+                            <span class="text-xs text-slate-400 block">소요 시간</span>
+                            <span class="font-bold text-sm text-slate-200">약 5분 내외</span>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-slate-800/40 border border-slate-700/30">
+                            <i class="fa-solid fa-chart-line text-accent-emerald text-lg mb-1 block"></i>
+                            <span class="text-xs text-slate-400 block">분석 리포트</span>
+                            <span class="font-bold text-sm text-slate-200">성장전략 포함</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-8">
+                        <button onclick="initiateTest()" class="w-full md:w-auto px-10 py-4 bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-xl shadow-brand-500/20 transform hover:-translate-y-0.5 transition duration-200 text-base">
+                            정밀 심리 진단 시작하기 <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Test Execution Screen -->
+            <section id="test-screen" class="hidden glass-panel rounded-3xl p-6 md:p-10 shadow-2xl transition-all duration-300">
+                <div class="flex flex-col h-full justify-between gap-6">
+                    <!-- Progress Bar Header -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                            <span id="progress-indicator">Question 01 of 32</span>
+                            <span id="progress-percent" class="text-brand-400">0% Completed</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700/30">
+                            <div id="test-progress-bar" class="h-full bg-gradient-to-r from-brand-500 to-indigo-500 progress-transition rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question Container -->
+                    <div class="my-6 md:my-10 text-center space-y-6">
+                        <span id="question-category" class="px-3 py-1 rounded-full bg-slate-800 text-brand-300 text-xs font-bold uppercase tracking-wider border border-slate-700">에너지 방향성 (E/I)</span>
+                        <h2 id="question-title" class="text-xl md:text-3xl font-bold text-white leading-snug max-w-3xl mx-auto px-4">
+                            과연 여기에 아주 길고 흥미롭고 세부적인 질문 텍스트가 들어가게 될까요?
+                        </h2>
+                    </div>
+
+                    <!-- Option Buttons -->
+                    <div class="grid grid-cols-1 gap-4 max-w-3xl mx-auto w-full mb-6">
+                        <button id="btn-option-a" onclick="handleAnswerSelection('A')" class="group relative w-full p-5 md:p-6 text-left rounded-2xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/40 hover:border-brand-500/60 transition-all duration-200 flex items-start gap-4 shadow-lg">
+                            <span class="w-8 h-8 rounded-lg bg-slate-700 group-hover:bg-brand-500/20 text-slate-300 group-hover:text-brand-300 flex items-center justify-center font-bold text-sm shrink-0 transition-all">A</span>
+                            <span id="text-option-a" class="text-sm md:text-base font-semibold leading-relaxed text-slate-200 group-hover:text-white transition-all">첫 번째 핵심 선택지 설명문구</span>
+                        </button>
+                        
+                        <button id="btn-option-b" onclick="handleAnswerSelection('B')" class="group relative w-full p-5 md:p-6 text-left rounded-2xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/40 hover:border-brand-500/60 transition-all duration-200 flex items-start gap-4 shadow-lg">
+                            <span class="w-8 h-8 rounded-lg bg-slate-700 group-hover:bg-brand-500/20 text-slate-300 group-hover:text-brand-300 flex items-center justify-center font-bold text-sm shrink-0 transition-all">B</span>
+                            <span id="text-option-b" class="text-sm md:text-base font-semibold leading-relaxed text-slate-200 group-hover:text-white transition-all">두 번째 핵심 선택지 설명문구</span>
+                        </button>
+                    </div>
+
+                    <!-- Navigation Footer -->
+                    <div class="flex justify-between items-center border-t border-slate-800/80 pt-5">
+                        <button id="btn-back-step" onclick="revertLastStep()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs md:text-sm font-semibold text-slate-300 flex items-center gap-2 transition disabled:opacity-30 disabled:pointer-events-none" disabled>
+                            <i class="fa-solid fa-chevron-left text-xs"></i> 이전 단계로
+                        </button>
+                        <span class="text-xs text-slate-500 font-medium">답변은 실시간 저장되며 나중에 수정 가능합니다</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Analytical Loading Splash Screen -->
+            <section id="loading-screen" class="hidden glass-panel rounded-3xl p-12 text-center shadow-2xl flex flex-col items-center justify-center min-h-[400px]">
+                <div class="relative w-24 h-24 mb-6">
+                    <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
+                    <div class="absolute inset-0 rounded-full border-4 border-t-brand-500 animate-spin"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <i class="fa-solid fa-microchip text-brand-400 text-3xl animate-pulse"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl md:text-2xl font-bold font-title mb-2">성격 구조 빅데이터 정합성 매핑 중</h3>
+                <p id="loading-tip" class="text-slate-400 text-sm max-w-sm">32개의 성격 차원 벡터를 연산하여 다차원 심리 프로파일을 생성하고 있습니다...</p>
+            </section>
+
+            <!-- 4. Advanced Result Report Screen -->
+            <section id="result-screen" class="hidden space-y-6 transition-all duration-300">
+                <!-- Top Overview Card -->
+                <div class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden">
+                    <div class="absolute -top-16 -right-16 w-48 h-48 bg-gradient-to-tr from-brand-500 to-indigo-500 rounded-full blur-3xl opacity-20"></div>
+                    <div class="flex flex-col md:flex-row items-center gap-6 md:gap-10">
+                        <!-- Emoji Badge -->
+                        <div class="w-32 h-32 md:w-40 md:h-40 rounded-3xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-7xl md:text-8xl shadow-inner relative shrink-0">
+                            <span id="display-emoji">🦊</span>
+                            <div class="absolute -bottom-2 bg-gradient-to-r from-brand-500 to-indigo-500 text-white text-[10px] md:text-xs px-3 py-1 rounded-full font-extrabold tracking-wider border border-slate-900 shadow">ARCHETYPE</div>
+                        </div>
+                        
+                        <!-- Main Title and Tagline -->
+                        <div class="text-center md:text-left space-y-3 flex-grow">
+                            <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                                <h1 id="display-mbti" class="text-4xl md:text-6xl font-extrabold font-title tracking-tight bg-gradient-to-r from-brand-300 to-indigo-300 bg-clip-text text-transparent">ESTP</h1>
+                                <span id="display-sub-title" class="px-3 py-1 rounded-lg bg-slate-800 text-xs font-bold border border-slate-700 text-slate-300">수완좋은 활동가형</span>
+                            </div>
+                            <h2 id="display-tagline" class="text-xl md:text-3xl font-bold text-white">"인생은 한 번뿐인 짜릿한 스릴러 영화처럼!"</h2>
+                            <p id="display-desc" class="text-slate-300 text-sm md:text-base leading-relaxed max-w-3xl">
+                                대단히 자신감이 넘치고 시원시원하며, 끊임없이 생동감 있는 도전을 갈망하는 선구자적 리더 유형입니다. 어떤 상황이 닥쳐도 특유의 번뜩이는 적응성과 임기응변 능력을 가동하여 위기를 기회로 극복하는 승부사 기질을 가지고 있습니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deep Score Breakdowns (Analytical Charts) -->
+                <div class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl space-y-6">
+                    <h3 class="text-lg md:text-xl font-bold font-title border-b border-slate-800 pb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-bar text-brand-400"></i> 선호 지표별 세부 분석 스코어
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Chart: E vs I -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span class="text-brand-300"><i class="fa-solid fa-bolt mr-1"></i> 외향 (E)</span>
+                                <span class="text-indigo-300">내향 (I) <i class="fa-solid fa-moon ml-1"></i></span>
+                            </div>
+                            <div class="relative w-full h-6 bg-slate-800 rounded-full overflow-hidden border border-slate-700/50 flex">
+                                <div id="chart-e" class="h-full bg-gradient-to-r from-brand-500 to-brand-400 flex items-center pl-3 text-[10px] font-bold text-white" style="width: 50%">0%</div>
+                                <div id="chart-i" class="h-full bg-gradient-to-l from-indigo-500 to-indigo-400 flex items-center justify-end pr-3 text-[10px] font-bold text-white ml-auto" style="width: 50%">0%</div>
+                            </div>
+                        </div>
+
+                        <!-- Chart: S vs N -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span class="text-brand-300"><i class="fa-solid fa-eye mr-1"></i> 감각 (S)</span>
+                                <span class="text-indigo-300">직관 (N) <i class="fa-solid fa-compass ml-1"></i></span>
+                            </div>
+                            <div class="relative w-full h-6 bg-slate-800 rounded-full overflow-hidden border border-slate-700/50 flex">
+                                <div id="chart-s" class="h-full bg-gradient-to-r from-brand-500 to-brand-400 flex items-center pl-3 text-[10px] font-bold text-white" style="width: 50%">0%</div>
+                                <div id="chart-n" class="h-full bg-gradient-to-l from-indigo-500 to-indigo-400 flex items-center justify-end pr-3 text-[10px] font-bold text-white ml-auto" style="width: 50%">0%</div>
+                            </div>
+                        </div>
+
+                        <!-- Chart: T vs F -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span class="text-brand-300"><i class="fa-solid fa-brain mr-1"></i> 사고 (T)</span>
+                                <span class="text-indigo-300">감정 (F) <i class="fa-solid fa-heart ml-1"></i></span>
+                            </div>
+                            <div class="relative w-full h-6 bg-slate-800 rounded-full overflow-hidden border border-slate-700/50 flex">
+                                <div id="chart-t" class="h-full bg-gradient-to-r from-brand-500 to-brand-400 flex items-center pl-3 text-[10px] font-bold text-white" style="width: 50%">0%</div>
+                                <div id="chart-f" class="h-full bg-gradient-to-l from-indigo-500 to-indigo-400 flex items-center justify-end pr-3 text-[10px] font-bold text-white ml-auto" style="width: 50%">0%</div>
+                            </div>
+                        </div>
+
+                        <!-- Chart: J vs P -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span class="text-brand-300"><i class="fa-solid fa-calendar mr-1"></i> 판단 (J)</span>
+                                <span class="text-indigo-300">인식 (P) <i class="fa-solid fa-wand-magic-sparkles ml-1"></i></span>
+                            </div>
+                            <div class="relative w-full h-6 bg-slate-800 rounded-full overflow-hidden border border-slate-700/50 flex">
+                                <div id="chart-j" class="h-full bg-gradient-to-r from-brand-500 to-brand-400 flex items-center pl-3 text-[10px] font-bold text-white" style="width: 50%">0%</div>
+                                <div id="chart-p" class="h-full bg-gradient-to-l from-indigo-500 to-indigo-400 flex items-center justify-end pr-3 text-[10px] font-bold text-white ml-auto" style="width: 50%">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strengths & Weaknesses Split -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Strengths Card -->
+                    <div class="glass-panel rounded-3xl p-6 md:p-8 shadow-2xl border-t-4 border-accent-emerald/80">
+                        <h3 class="text-lg font-bold font-title text-accent-emerald mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i> 심리적 핵심 장점 분석
+                        </h3>
+                        <ul id="display-pros" class="space-y-3 custom-scrollbar max-h-72 overflow-y-auto pr-2 text-sm text-slate-300">
+                            <!-- Dynamically loaded -->
+                        </ul>
+                    </div>
+
+                    <!-- Weaknesses Card -->
+                    <div class="glass-panel rounded-3xl p-6 md:p-8 shadow-2xl border-t-4 border-accent-rose/80">
+                        <h3 class="text-lg font-bold font-title text-accent-rose mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-triangle-exclamation"></i> 주의가 필요한 한계 및 단점
+                        </h3>
+                        <ul id="display-cons" class="space-y-3 custom-scrollbar max-h-72 overflow-y-auto pr-2 text-sm text-slate-300">
+                            <!-- Dynamically loaded -->
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Growth Strategy / Professional Development -->
+                <div class="glass-panel rounded-3xl p-6 md:p-8 shadow-2xl border-t-4 border-accent-amber/80">
+                    <h3 class="text-lg font-bold font-title text-accent-amber mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-seedling"></i> 자아 성장을 위한 보완 솔루션 (Growth Tips)
+                    </h3>
+                    <div id="display-growth" class="space-y-4 text-sm text-slate-300">
+                        <!-- Dynamically loaded -->
+                    </div>
+                </div>
+
+                <!-- Professional Careers & Work Style -->
+                <div class="glass-panel rounded-3xl p-6 md:p-8 shadow-2xl">
+                    <h3 class="text-lg font-bold font-title text-indigo-300 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-briefcase"></i> 추천 진로 및 비즈니스 환경
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 rounded-2xl bg-slate-800/40 border border-slate-700/20 text-center">
+                            <div class="w-10 h-10 rounded-full bg-brand-500/10 text-brand-400 flex items-center justify-center mx-auto mb-2"><i class="fa-solid fa-lightbulb"></i></div>
+                            <span class="text-xs text-slate-400 block font-bold mb-1">매치 직무 1</span>
+                            <span id="career-1" class="text-sm font-semibold text-white">기획 및 전략</span>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-slate-800/40 border border-slate-700/20 text-center">
+                            <div class="w-10 h-10 rounded-full bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto mb-2"><i class="fa-solid fa-handshake"></i></div>
+                            <span class="text-xs text-slate-400 block font-bold mb-1">매치 직무 2</span>
+                            <span id="career-2" class="text-sm font-semibold text-white">마케팅 및 영업</span>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-slate-800/40 border border-slate-700/20 text-center">
+                            <div class="w-10 h-10 rounded-full bg-accent-emerald/10 text-accent-emerald flex items-center justify-center mx-auto mb-2"><i class="fa-solid fa-layer-group"></i></div>
+                            <span class="text-xs text-slate-400 block font-bold mb-1">매치 직무 3</span>
+                            <span id="career-3" class="text-sm font-semibold text-white">경영 컨설팅</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compatibility Card -->
+                <div class="glass-panel rounded-3xl p-6 md:p-8 shadow-2xl">
+                    <h3 class="text-lg font-bold font-title text-slate-200 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-heart-pulse text-accent-rose animate-pulse"></i> 다른 성격 유형과의 관계 시너지
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-2xl bg-accent-emerald/5 border border-accent-emerald/20 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-3xl">🤝</span>
+                                <div>
+                                    <span class="text-xs text-slate-400 block font-bold">환상의 케미 (최고의 시너지)</span>
+                                    <span id="comp-best" class="text-sm font-bold text-accent-emerald">ISFJ / INFJ</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-accent-rose/5 border border-accent-rose/20 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-3xl">⚠️</span>
+                                <div>
+                                    <span class="text-xs text-slate-400 block font-bold">개선적 케미 (의도적 조율 필요)</span>
+                                    <span id="comp-worst" class="text-sm font-bold text-accent-rose">INFP / ENFP</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Footer Action Buttons -->
+                <div class="flex flex-col md:flex-row gap-4 pt-4">
+                    <button onclick="shareTestSummary()" class="flex-1 py-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-arrow-up-from-bracket"></i> 분석 결과 클립보드 복사
+                    </button>
+                    <button onclick="relaunchTest()" class="flex-1 py-4 bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-xl shadow-brand-500/20 transform hover:-translate-y-0.5 transition duration-200 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> 심리 검사 재실행하기
+                    </button>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer Info -->
+        <footer class="text-center py-4 text-xs text-slate-500 mt-6 border-t border-slate-900">
+            <p>© 2026 M-Profile Research Labs. All rights reserved. 본 웹 서비스는 정밀 연구 및 분석 진단에 적합하도록 정교하게 세그먼트가 구조화되었습니다.</p>
+        </footer>
     </div>
 
+    <!-- Core Interactive Logic Engine -->
     <script>
-        // 32가지 질문 데이터 (E/I, S/N, T/F, J/P 각 8문항씩)
-        const questions = [
-            // 1~8: E vs I
-            { q: "주말에 에너지를 충전하는 나만의 방식은?", a: "친구들과 만나 수다 떨며 스트레스 풀기", b: "이불 속에서 넷플릭스 보며 혼자만의 시간 갖기", type: "EI" },
-            { q: "새로운 모임에 갔을 때 나의 행동은?", a: "먼저 말을 걸며 분위기를 주도한다", b: "조용히 눈치를 보며 다가오는 사람과 대화한다", type: "EI" },
-            { q: "팀 프로젝트를 할 때 내가 선호하는 역할은?", a: "말을 많이 하고 회의를 이끄는 발표자", b: "묵묵히 자료를 조사하고 정리하는 조력자", type: "EI" },
-            { q: "기분이 울적할 때 생각나는 것은?", a: "밖으로 나가서 사람들을 만나고 싶다", b: "혼자 방에서 조용히 음악을 듣고 싶다", type: "EI" },
-            { q: "전화 통화와 문자 메시지 중 편한 것은?", a: "용건이 있으면 바로 전화하는 게 편함", b: "메시지로 미리 생각하고 보내는 게 편함", type: "EI" },
-            { q: "여러 사람 앞에서 주목받는 상황이 생기면?", a: "내심 즐기며 은근히 신난다", b: "몸이 굳고 빨리 탈출하고 싶어진다", type: "EI" },
-            { q: "처음 본 사람과 친해지는 속도는?", a: "5분만 얘기해도 절친 가능", b: "몇 번은 만나야 서서히 마음을 엶", type: "EI" },
-            { q: "지나가다 아는 사람을 우연히 발견했다면?", a: "반갑게 아는 척하며 다가간다", b: "못 본 척 스쳐 지나가거나 도망친다", type: "EI" },
+        // --- 32-Question Balanced Psychological Assessment Database ---
+        const testDatabase = [
+            // [1-8] E (Extroversion) vs I (Introversion)
+            { id: 1, type: "EI", cat: "에너지 충전 방식", q: "고단하고 지쳤던 긴 프로젝트가 드디어 끝났습니다. 당신이 에너지를 다시 채우기 위해 가장 먼저 떠올리는 시나리오는 무엇인가요?", a: "그동안 못 보았던 가깝고 에너제틱한 사람들을 한데 불러 모아 맛있는 음식을 먹고 깊이 소통하며 스트레스를 날린다.", b: "외부 자극을 완전히 차단한 고독한 공간에서 혼자 조용히 게임, 책, 영화를 탐닉하며 절대적인 숙면을 취한다." },
+            { id: 2, type: "EI", cat: "대면 및 관계 형성", q: "초대를 받아 방문하게 된 대규모 네트워킹 행사나 파티 현장, 낯선 사람들로 가득 찬 공간에서 당신은 대개 어떻게 처신하나요?", a: "기꺼이 먼저 미소를 지으며 모르는 사람들에게 인사를 건네고, 적극적으로 새로운 관계의 접점을 만든다.", b: "아는 사람이나 마음이 편안한 지인 곁을 가급적 지키며, 누군가 호의를 가지고 다가와 말을 걸어주기를 기다린다." },
+            { id: 3, type: "EI", cat: "협동 & 대화 선호도", q: "공동의 과제나 실무 회의 도중, 브레인스토밍 단계가 찾아왔을 때 당신의 아이디어 제시 프로세스는 어떻게 흘러가나요?", a: "머릿속에 떠오른 생각 파편들을 즉흥적으로 입 밖으로 내뱉어 서로 피드백을 주고받으면서 최적화하는 편이다.", b: "생각을 머릿속에서 일관성 있고 조밀하게 완전히 정리하여 논리적 검증을 거친 뒤에야 비로소 차분히 발언한다." },
+            { id: 4, type: "EI", cat: "주목에 대한 태도", q: "우연한 계기나 좋은 기회로 대중 앞에서 크나큰 관심의 주역이 되거나 리드해야 하는 자리가 마련되었습니다. 당신의 솔직한 감정 상태는?", a: "살짝의 긴장은 있어도 이왕 찾아온 세련된 무대를 내심 즐기며 스스로의 가치를 뽐내고 싶은 흥분감을 느낀다.", b: "엄청난 무게와 피로감이 밀려오며 가급적 빠르게 할 일만 깔끔하게 마치고 스포트라이트 밖으로 벗어나고 싶다." },
+            { id: 5, type: "EI", cat: "업무 수행 환경", q: "어떠한 사무 환경이나 학습 조건 속에서 일할 때 극강의 업무 집중도와 심리적 편안함이 동반되는 느낌을 받나요?", a: "동료들과 편하게 활발히 토론할 수 있으며 가벼운 잡담도 허용되는 시끌벅적하고 협동적인 오픈 에이리어.", b: "완전히 독립되어 사색이 방해받지 않는 차분하고 집중적인 방음 독서실 형태나 프라이빗 데스크 스페이스." },
+            { id: 6, type: "EI", cat: "전화 vs 텍스트", q: "실무 상황 또는 일상에서 상대방과 급하게 조율해야 할 세부사항이 발생했습니다. 선호하는 커뮤니케이션 채널은?", a: "상대의 뉘앙스나 어조를 곧바로 체크하여 신속하게 즉답을 얻을 수 있는 통화(Call)를 직진 선택한다.", b: "구문을 직접 눈으로 정독하고 어휘를 필터링할 시간을 가질 수 있는 메신저나 슬랙 텍스트(Text)를 선호한다." },
+            { id: 7, type: "EI", cat: "피로 노출도", q: "많은 사람들과 즐거운 시간을 보낸 후 집으로 돌아올 때 몸에서 보내는 가장 즉각적인 생리적 피드백 신호는 무엇인가요?", a: "사람들에게서 긍정적인 파동을 잔뜩 흡수한 덕에 몸이 훈훈하게 덥혀지고 오히려 더 무언가 하고 싶은 기분이 든다.", b: "마치 배터리 잔량이 0%에 근접해 무겁게 방전되듯 심한 정신적 고단함이 밀려와 한시바삐 침대로 가고 싶다." },
+            { id: 8, type: "EI", cat: "친근함 정의", q: "누군가 당신에게 '이 사람이 나와 아주 가까운 진정한 친우(Friend)다'라고 할 때 기준은 보통 어디에 수렴하나요?", a: "비교적 폭넓고 다양한 활동 지평을 공유하는 다수의 흥미로운 친구 집단이 다각도로 구성되어 있다.", b: "일생을 두고 깊게 탐구하며 단 몇 명일지라도 영적인 주파수를 나누는 초밀착 형태의 소수 관계망을 선호한다." },
 
-            // 9~16: S vs N
-            { q: "영화나 소설을 볼 때 내가 더 몰입하는 부분은?", a: "현실감 넘치고 짜임새 있는 스토리", b: "상상력을 자극하는 독특한 세계관과 은유", type: "SN" },
-            { q: "사과 한 개를 보고 드는 생각은?", a: "아삭아삭하고 맛있겠다, 빨갛다", b: "뉴턴의 만유인력... 백설공주... 애플 스마트폰...?", type: "SN" },
-            { q: "길을 찾을 때 내가 의존하는 것은?", a: "지도 앱의 실제 건물 거리뷰와 나침반", b: "대략적인 방향 감각과 '이쯤 가다 보면 나오겠지'라는 느낌", type: "SN" },
-            { q: "새로운 가전제품을 샀을 때 나는?", a: "설명서를 처음부터 꼼꼼히 읽어본다", b: "일단 전원부터 켜고 이것저것 눌러본다", type: "SN" },
-            { q: "친구가 '나 요즘 멍 때리는 시간이 많아졌어'라고 한다면?", a: "'무슨 생각 해?'라고 물어본다", b: "'아무 생각 안 하는 거지?'라며 공감한다", type: "SN" },
-            { q: "요리를 할 때 나의 스타일은?", a: "레시피의 정량(g, 스푼)을 정확히 지킨다", b: "감으로 양념을 대충 털어 넣으며 간을 본다", type: "SN" },
-            { q: "만약 내일 당장 로또 1등에 당첨된다면?", a: "세금 계산과 은행 예금 이율을 알아본다", b: "당첨금을 타러 갈 때 변장할 옷부터 상상한다", type: "SN" },
-            { q: "시험 공부를 할 때 나의 방식은?", a: "교과서 위주로 개념을 암기하고 문제를 푼다", b: "전체적인 흐름과 원리를 이해하려 노력한다", type: "SN" },
+            // [9-16] S (Sensing) vs N (Intuition)
+            { id: 9, type: "SN", cat: "정보 획득 방식", q: "어떠한 개념이나 보고서, 신규 아이디어를 처음 브리핑받을 때 당신의 두뇌가 우선적으로 파고드는 디테일은 무엇인가요?", a: "수치적으로 명시된 누적 데이터, 실존하는 사실, 눈에 보이는 증거 등 검증 가능하고 구체적인 수치 정보.", b: "이 프로젝트가 뒤흔들 미래 산업의 비전, 무형의 핵심 흐름, 이면에 숨어있는 추상적 메커니즘과 패턴." },
+            { id: 10, type: "SN", cat: "사고실험과 상상", q: "특별히 해야 할 일 없이 멍하니 앉아 공상의 시간이 찾아왔을 때, 주로 꼬리를 물고 나아가는 생각의 성질은 무엇인가요?", a: "오늘 하루 처리했던 일정 조율, 밀린 고지서 정리, 다가올 휴가 숙소 탐색 등 지극히 현실적이고 눈앞의 할 일들.", b: "우주의 기원, 평행 세계의 법칙, 먼 미래 인간의 한계성 등 일상과는 전혀 연관이 없는 철학적이거나 비약적인 상상들." },
+            { id: 11, type: "SN", cat: "가이드 활용 태도", q: "이해관계가 얽혀있는 기계 조립 가이드나 전문 코딩 프레임워크 설명서를 대하는 당신의 현실적인 스타일은?", a: "제시되어 있는 순서, 볼트 번호, 한 줄의 코드 설명도 임의로 뛰어넘지 않고 단계적으로 차근차근 준수한다.", b: "전반적인 흐름과 아키텍처 원리를 직감으로 빠르게 습득한 후 가이드는 뒤로하고 스스로 유연하게 개조해 본다." },
+            { id: 12, type: "SN", cat: "표현의 취향", q: "타인과의 의사소통 단계나 프레젠테이션 스피치 시 더 큰 안정감과 매력을 느끼는 서술 스타일은 무엇인가요?", a: "과장이나 미사여구를 최대한 배제하고, 직접적이고 실증적이며 명쾌한 단어로 결과를 정조준하는 스피치.", b: "은유와 적확한 비유적 묘사를 조합하여 전하고자 하는 핵심 개념과 넓은 함의를 가슴에 퍼뜨리는 심오한 스피치." },
+            { id: 13, type: "SN", cat: "과거와 미래 가치", q: "인생이나 사업의 중요한 고비에서 해결책을 갈구해야 할 때 당신이 더 높은 신뢰와 가치를 부여하는 나침반은?", a: "과거에 수많은 현자들에 의해 검증되어 직접 유용한 교훈을 준 선례, 축적된 연혁과 경험의 누적 데이터.", b: "앞으로 창조해 나갈 무한한 가능성, 이전에는 시도된 적 없으나 충분히 설계 가능한 모험적이고 혁신적인 가설." },
+            { id: 14, type: "SN", cat: "디테일 정합성", q: "새로운 가전제품이나 최신 전자기기의 구매 후 개봉 프로세스를 지켜볼 때 당신에게 가장 가까운 모습은?", a: "실제 부속품 리스트가 빠짐없이 동봉되었는지 꼼꼼히 세어보고 초기 불량이 있는지 기기 외관을 상세히 체크한다.", b: "이 기기가 제공하는 새롭고 화려한 스마트 기능이 내 작업 워크플로우를 앞으로 어떻게 바꿔놓을지부터 상상하며 켜본다." },
+            { id: 15, type: "SN", cat: "창작에 대한 지향", q: "당신이 만약 미술, 소설, 영화 등 한 편의 창작 예술 작품을 주도적으로 감상하거나 직접 집필하려 할 때 지향하는 방향은?", a: "실제 삶의 극사실적 묘사, 공감 가고 현실 고증이 명확한 인물 묘사 및 사건 전개의 현실감.", b: "한계에 구속받지 않는 전위적인 상징성, 파격적인 서사의 뒤틀림, 독자가 저마다 다르게 해석해 낼 열린 지혜." },
+            { id: 16, type: "SN", cat: "일 처리 방식", q: "협동 과업 상황에서 업무를 구조화할 때 당신을 가장 편안하게 유도하는 체계적인 가이드 방식은 무엇인가요?", a: "업무의 A to Z가 가독성 높게 정리되어 있고, 예상 결과물이 실제 양식으로 딱 떨어지게 명문화되어 있는 상태.", b: "이 업무가 궁극적으로 기여하게 될 비즈니스의 대전제와 방향성만 주어지고, 구체적인 설계는 내 자유 영역인 상태." },
 
-            // 17~24: T vs F
-            { q: "친구가 열심히 준비한 시험에서 떨어졌다고 울 때 나의 반응은?", a: "'어떤 과목이 어려웠어? 다음 시험은 언제야?'", b: "'아이고 속상해라ㅠㅠ 진짜 고생 많았는데 어떡해...'", type: "TF" },
-            { q: "대화할 때 내가 더 중요하게 생각하는 것은?", a: "정확한 사실 관계와 논리적인 대화", b: "상대방의 기분과 대화의 부드러운 분위기", type: "TF" },
-            { q: "친구가 미용실에서 머리를 망쳤다며 속상해할 때 내 대답은?", a: "'머리 어디가 망쳤는데? 다시 해달라고 해!'", b: "'에이 그래도 괜찮은데 속상하겠다ㅠㅠ 금방 자랄 거야'", type: "TF" },
-            { q: "칭찬을 들을 때 더 기분 좋은 말은?", a: "너 진짜 일 잘한다, 똑똑하다", b: "너랑 있으면 마음이 편해, 착하다", type: "TF" },
-            { q: "다른 사람과 의견 충돌이 생겼을 때 나는?", a: "누구 말이 옳고 그른지 끝까지 따져본다", b: "관계가 서먹해질까 봐 적당히 양보하고 타협한다", type: "TF" },
-            { q: "영화를 보다가 슬픈 장면이 나오면?", a: "눈물이 날 수도 있지만 슬픈 원인을 분석함", b: "주인공에 완벽 빙의해서 폭풍 눈물을 흘림", type: "TF" },
-            { q: "누군가 나에게 조언을 구하면 나는?", a: "해결 방안과 팩폭을 날려준다", b: "열심히 위로해 주고 편을 들어준다", type: "TF" },
-            { q: "잘못을 지적당했을 때 드는 생각은?", a: "지적받은 내용이 맞는지 틀린지 판단함", b: "나를 싫어해서 저렇게 말하는 건지 기분 상함", type: "TF" },
+            // [17-24] T (Thinking) vs F (Feeling)
+            { id: 17, type: "TF", cat: "피드백 수렴 태도", q: "프로젝트 진행 결과물을 담당자에게 제출했는데 극히 정교하고 매서운 지적과 피드백을 한껏 받았습니다. 당신에게 가장 먼저 번개처럼 스쳐가는 생각은?", a: "지적받은 논리가 객관적으로 타당한가? 맞다면 즉시 에러코드를 패치하고 수정 보완해야 할 부분으로 뇌를 전력 가동한다.", b: "이 사람이 평소에 나와 관계가 껄끄러웠던 건가? 아니면 혹시 나의 작업 태도와 열정 그 자체를 무시하는 건가? 하는 기분적 상처가 먼저 일어난다." },
+            { id: 18, type: "TF", cat: "위로의 올바른 해석", q: "아끼는 지인이 중대하고 뼈아픈 실수를 하여 사업이나 학업을 크게 망쳤다고 눈물로 고백할 때 당신의 위로 메커니즘은?", a: "사건의 기승전결을 빠르게 파악해 본질적 오류를 수정해 줄 원인 처방과 당장 취해야 할 합리적 대안들을 찾아준다.", b: "절망감에 흔들리는 상대의 정서적 구원에 완벽히 동조하여 손을 잡아주고 기꺼이 그의 가장 강력한 감정적 편이 되어준다." },
+            { id: 19, type: "TF", cat: "결정의 최고 잣대", q: "회사의 경영진이나 모임의 리더로서 다수의 운명이 바뀔 중대한 선택을 내려야 할 때, 가장 최후의 잣대로 세우는 기준은?", a: "비용과 산출물, 공정과 정의, 객관적인 룰과 시장 법칙에 철저하게 수렴하는 절대적 인과 관계의 타당성.", b: "이 결정이 모임 안의 구성원들에게 미칠 정서적 후폭풍, 내부 화합의 조화로움과 인간관계적 리스크의 최소화." },
+            { id: 20, type: "TF", cat: "공정함 정의", q: "당신이 바라보는 '참다운 사회와 공정함(Justice)'이란 어떤 모습에 가깝게 성립되는 가치인가요?", a: "어떤 지연이나 혈연, 사사로운 감정의 흔들림 없이 법과 규격이 모두에게 한치의 예외도 없이 칼같이 실현되는 사회.", b: "사회적 약자와 구성원 저마다의 기구한 정황, 개인적 아픔을 깊이 정상 참작하고 보호하여 조화와 상생이 이뤄지는 사회." },
+            { id: 21, type: "TF", cat: "갈등에 대처하는 자세", q: "협동 관계에서 가벼운 불화나 의견의 날카로운 충돌이 대립되었습니다. 당신이 직면하려 하는 태도는?", a: "감정적인 논쟁은 차단한 채 무엇이 정확하고 그른지 시시비비를 이성적 팩트 체크로 확실히 분해해 매듭지어야 한다.", b: "양측의 자존심이나 감정적 마음의 상처를 먼저 부드럽게 쓰다듬고 대승적 화해를 먼저 도출하는 것이 급선무다." },
+            { id: 22, type: "TF", cat: "선호하는 칭찬", q: "당신이 긴 시간 끝에 해낸 성과물에 대해 들었을 때 가장 가슴속 깊이 짜릿한 전율이 전해져 오는 진정한 찬사는?", a: "당신 진짜 실력 대단하다. 어떻게 이런 천재적인 로직과 극강의 효율성을 구현했는지 진정 존경스럽다.", b: "당신이 우리 곁에 있어줘서 분위기가 너무 포근하다. 당신의 따스한 헌신과 소통 능력이 없었다면 모두 불가능했을 것이다." },
+            { id: 23, type: "TF", cat: "공감 메커니즘", q: "슬픈 영화나 뉴스 보도에서 비참한 환경에 처한 비극적 타인을 지켜볼 때 당신의 심상 변화는 주로 어떻게 시작되나요?", a: "가엾고 슬픈 정황이라는 인지적 사실에 동의하며, 실질적으로 저들을 도울 모금 수단이나 솔루션의 효율을 생각한다.", b: "마치 타인의 아픔이 나의 육체와 영혼 속으로 고스란히 복제되듯 가슴 시린 정서적 격랑과 생리적 눈물이 고인다." },
+            { id: 24, type: "TF", cat: "인정 수렴 방식", q: "토론이나 업무 논쟁에서 자신의 가설이 상대에 의해 논리적으로 완전히 파훼되고 말았습니다. 이때 느끼는 당신의 내면 상태는?", a: "지적받은 논파 구조가 참이므로 신속하게 내 논지를 수정하고 새로운 인사이트를 습득하게 된 배움에 지적 희열을 느낀다.", b: "자신의 주장이 틀렸다는 팩트의 가치보다 나와 대척하여 서슬 퍼렇게 팩폭을 가해 온 상대방의 날카로운 말투에 마음이 다소 상한다." },
 
-            // 25~32: J vs P
-            { q: "여행을 떠나기 전, 나의 계획 수준은?", a: "시간별 동선, 맛집 리스트, 플랜B까지 완벽 준비", b: "비행기 표랑 숙소만 예약하고 발길 닿는 대로", type: "JP" },
-            { q: "과제나 업무 마감일이 다가올 때 나의 행동은?", a: "미리미리 매일 조금씩 나눠서 끝낸다", b: "벼락치기가 진정한 효율! 마감 직전 초사이언 모드", type: "JP" },
-            { q: "내 방 책상이나 서랍의 상태는?", a: "물건들이 제자리에 정리정돈 잘 되어 있음", b: "자유로운 어지러움 속에 나만 아는 규칙이 있음", type: "JP" },
-            { q: "약속 시간이 정해졌을 때 나는?", a: "늦지 않게 교통상황까지 고려해 미리 출발함", b: "시간 딱 맞춰 가거나 꼭 5~10분씩 늦음", type: "JP" },
-            { q: "갑작스러운 번개 모임 제안이 들어온다면?", a: "미리 짜둔 오늘 일정이 꼬여서 부담스럽다", b: "오히려 좋아! 재밌겠다며 바로 달려 나간다", type: "JP" },
-            { q: "해야 할 일(ToDo List)을 적을 때 나는?", a: "체크리스트를 지워가는 쾌감을 즐김", b: "적어만 두고 리스트 존재 자체를 까먹음", type: "JP" },
-            { q: "마트에 장을 보러 갈 때 나의 모습은?", a: "살 물건 목록을 미리 적어서 그것만 사 옴", b: "구경하다가 맛있어 보이고 세일하는 거 다 담음", type: "JP" },
-            { q: "하루 일과를 마칠 때 나는?", a: "오늘 계획한 일을 다 끝냈는지 확인해 봄", b: "오늘 하루도 무사히 흘러갔음에 만족함", type: "JP" }
+            // [25-32] J (Judging) vs P (Perceiving)
+            { id: 25, type: "JP", cat: "일정 및 실행 통제", q: "당신에게 다가오는 다음 한 주의 타이트한 스케줄 혹은 일일 계획을 준비할 때, 가장 흡사한 태도는 무엇입니까?", a: "요일별 핵심 할 일과 시간의 타임라인을 명확히 할당하고, 우선순위를 정조준해 가시적인 체크리스트를 미리 마련한다.", b: "그때그때 당일의 기분 상태와 예기치 못한 돌발 변수에 영민하게 적응할 수 있도록 스케줄을 가급적 유연하게 비워둔다." },
+            { id: 26, type: "JP", cat: "위기 대처와 준비성", q: "타지로 장기 휴가를 떠나기 위한 여권, 교통편, 현지 체류 플랜을 조율할 때 당신의 마음가짐은 무엇에 더 가깝나요?", a: "사전 조사로 도출된 검증된 장소, 시간표, 만약의 사태를 대비한 예비 동선(Plan B)까지 철저히 세팅되어야 마음이 놓인다.", b: "비행기와 필수 숙박 시설만 확실하다면 나머지는 언제든 발길 닿는 대로 로컬의 보석 같은 우연성을 마주치는 것이 여행의 진짜 묘미다." },
+            { id: 27, type: "JP", cat: "데드라인 극대화", q: "중대한 프로젝트 제안서나 학술 보고서 제출 기한이 눈앞으로 다가오고 있습니다. 당신의 실천 주기는 어떻게 작동하나요?", a: "가동 시간을 역순으로 정밀 계산하여 일일 정량으로 점진적으로 쪼개어 완성하며, 마감 전날에는 여유롭게 검수한다.", b: "완만한 작업 페이스는 영감이 나오지 않는다. 마감 한두 시간을 남겨둔 극치의 압박 속에서 엄청난 속도로 끝맺는다." },
+            { id: 28, type: "JP", cat: "공간 관리 습관", q: "당신이 일상적으로 서식하는 생활 영역(개인 책상, PC 바탕화면, 메신저 함 등)의 현실적인 레이아웃 상태는?", a: "각각의 물건과 파일이 카테고리별 폴더, 서랍 구획에 정연하게 꽂혀있어 단 5초 만에 원하는 자원을 찾아낼 수 있다.", b: "타인이 보면 카오스(Chaos) 그 자체이지만, 어지러운 자연스러움 속에 나만의 독보적인 사용 순서가 잡혀있는 상태다." },
+            { id: 29, type: "JP", cat: "예기치 못한 초청", q: "주말 저녁, 이미 나만의 온전한 휴식 루틴을 가동 중이었는데 친밀한 지인이 갑작스러운 '지금 바로 나와서 맥주 한잔하자'는 즉흥 제안을 합니다. 당신의 반응은?", a: "오늘 예정된 나의 휴식 타임라인과 에너지 조율 일정을 침해당하는 것 같아 심한 번거로움과 불편함을 느껴 정중히 사양한다.", b: "오히려 예측 불허한 우연적 이벤트가 반갑고 신선한 활력을 줄 것이라 생각하며 그 즉시 외출 준비를 가뿐히 시작한다." },
+            { id: 30, type: "JP", cat: "약속 시간 엄수", q: "중요도가 높은 사교 약속이나 공식 미팅 시간이 가까워질 때 당신의 현실적인 시간 관리 마인드셋은?", a: "어떤 대중교통의 지연 리스크도 감안하여 가급적 약속시간 10~15분 전에 반드시 현장에 세이프티 정착하도록 통제한다.", b: "출발 직전 옷매무새를 다듬다 무의식적으로 시간이 지체되어 약속 시간에 간당간당하게 세이프하거나 본의 아니게 꼭 5분씩 지각한다." },
+            { id: 31, type: "JP", cat: "쇼핑 시 태도", q: "어떤 목적으로 마트나 대형 쇼핑몰에 방문했을 때 당신의 동선 구조는 어떻게 제어되나요?", a: "미리 집에서 필요한 상품 목록을 노트에 정갈하게 타이핑해 왔으며, 불필요한 배회 없이 장바구니에 담고 신속 퇴장한다.", b: "쇼핑몰 입구부터 다채로운 진열대를 여유롭게 순찰하고, 우연히 시선을 끄는 특별 할인가 제품이나 흥미 유발 완구까지 다 담는다." },
+            { id: 32, type: "JP", cat: "완료의 즐거움", q: "당신이 인생의 성취를 일구며 가장 쾌감과 안정감을 강하게 흡수하는 궁극적인 심리적 국면은 어느 쪽입니까?", a: "모든 불확실성이 명료하게 통제되었으며, 기획한 일이 정교하게 '완결되어 종결'되었을 때 오는 질서정연한 홀가분함.", b: "언제든 나의 도전을 바꿀 수 있고, 새로운 가능성이 끊임없이 열려 있으며, 마감되지 않은 채 유연하게 흐르는 선택의 무한함." }
         ];
 
-        // 16가지 MBTI 결과 데이터
-        const mbtiResults = {
-            ISTJ: { emoji: "🐨", title: "걸어 다니는 인간 법전", pros: ["강한 책임감", "완벽한 시간 약속", "정확한 일 처리"], cons: ["융통성 제로", "변화를 극도로 싫어함", "은근히 꼰대 기질"] },
-            ISFJ: { emoji: "🐹", title: "방구석 요정 보디가드", pros: ["엄청난 배려심", "주변 사람 잘 챙김", "기억력 천재"], cons: ["거절 못 해서 독박 씀", "혼자 속으로 끙끙 앓음", "서운함 잘 쌓임"] },
-            INFJ: { emoji: "🦉", title: "우주 최고 속을 알 수 없는 선지자", pros: ["깊은 통찰력", "높은 공감 능력", "이상적인 도덕성"], cons: ["생각이 너무 많아 불면증", "인간관계 '손절' 장인", "완벽주의 스트레스"] },
-            INTJ: { emoji: "🦅", title: "인간 냉장고 속 지략가", pros: ["냉철한 분석력", "독립적이고 스마트함", "목표 달성 괴물"], cons: ["사람 성격 분석하려 듦", "감정 공감 능력 상실", "자기가 제일 똑똑한 줄 앎"] },
-            ISTP: { emoji: "🐯", title: "효율성 극대화 귀차니즘 만렙", pros: ["강심장과 대범함", "뛰어난 위기 대처", "손재주가 좋음"], cons: ["연락 두절 잠수왕", "만사 귀찮음", "영혼 없는 리액션"] },
-            ISFP: { emoji: "🐱", title: "침대와 물아일체 예술가", pros: ["따뜻하고 온화함", "미적 감각 뛰어남", "갈등을 싫어하는 평화주의자"], cons: ["미루기 끝판왕", "유리 멘탈", "결정 장애"] },
-            INFP: { emoji: "🐰", title: "망상과 감성 폭발 민들레", pros: ["풍부한 상상력", "따뜻한 공감 능력", "나만의 뚜렷한 가치관"], cons: ["유리쿠션 멘탈", "시작은 거창하나 끝은 흐지부지", "혼자만의 오해 장인"] },
-            INTP: { emoji: "🧠", title: "방구석 아인슈타인", pros: ["논리적 분석왕", "창의적 아이디어 넘침", "편견이 없음"], cons: ["말투가 은근 시비조", "사회성 부족", "행동은 안 하고 구상만 함"] },
-            ESTP: { emoji: "🦊", title: "인생은 한 번뿐인 스릴러", pros: ["넘치는 자신감", "지루할 틈 없는 유머", "현실 감각 최고"], cons: ["충동 조절 장치 고장", "말보다 몸이 먼저 나감", "끈기 부족 깊이 없음"] },
-            ESFP: { emoji: "🦁", title: "본투비 핵인싸 슈퍼스타", pros: ["사교성 우주 최고", "분위기 메이커", "인생을 즐길 줄 앎"], cons: ["소비 요정 지갑 멸망", "진지한 대화 거부", "쉽게 싫증 냄"] },
-            ENFP: { emoji: "🐶", title: "흥 넘치는 리액션 로봇", pros: ["에너자이저 급 활력", "풍부한 리액션", "친화력 대왕"], cons: ["주의 산만 금사빠", "감정 기복 롤러코스터", "계획이란 단어 모름"] },
-            ENTP: { emoji: "🦄", title: "말싸움 지면 잠 못 자는 프로 반박러", pros: ["두뇌 회전 빠름", "말발 우주 최강", "자신감 만렙"], cons: ["모든 대화의 토론화", "끈기 부족", "은근히 시비 거는 악마의 대변인"] },
-            ESTJ: { emoji: "🐻", title: "지옥에서 온 효율 중독 지휘관", pros: ["조직 관리 신", "강한 실행력", "화끈하고 솔직함"], cons: ["위로 대신 팩트 폭행", "지적질 대왕", "계획대로 안 되면 폭발"] },
-            ESFJ: { emoji: "🦌", title: "오지랖 넓은 마당발 보안관", pros: ["엄청난 친절함", "조직의 활력소", "기억력 최고"], cons: ["인정 욕구 과다", "남의 눈치 엄청 봄", "거절하면 상처받음"] },
-            ENFJ: { emoji: "🦚", title: "온 우주를 구하려는 열정 리더", pros: ["타인을 이끄는 리더십", "긍정 파워 넘침", "타인의 성장을 도움"], cons: ["과도한 오지랖", "남의 비판에 개개인 상처", "감정 과몰입"] },
-            ENTJ: { emoji: "🦁", title: "야망 넘치는 폭군 CEO", pros: ["압도적인 리더십", "철저한 목표 지향", "위기를 기회로 만듦"], cons: ["부하직원 피 말리는 스타일", "공감 능력 제로", "자존심 지상 최강"] }
+        // --- 16 Comprehensive MBTI Deep Analysis Database ---
+        const personalityReportDatabase = {
+            ISTJ: {
+                emoji: "🐨",
+                subTitle: "체계적인 현실주의자",
+                tagline: "신뢰와 원칙, 세상의 기틀을 바쳐주는 기둥",
+                desc: "철두철미한 책임감과 사실 중심의 사고로 조직과 사회의 약속을 완벽하게 수호하는 현실주의 지휘자입니다.",
+                pros: [
+                    "<strong>압도적인 성실성:</strong> 한 번 맡은 과업은 어떤 역경이 있어도 끝까지 완결해 냅니다.",
+                    "<strong>논리적이고 체계적인 기억력:</strong> 명확한 누적 사실과 정확한 데이터를 바탕으로 실수를 사전 차단합니다.",
+                    "<strong>약속과 규범 수호:</strong> 시간 약속이나 비즈니스 가이드라인을 극도로 정확하게 준수합니다."
+                ],
+                cons: [
+                    "<strong>예기치 못한 변화에 취약:</strong> 급격한 변동성이나 계획되지 않은 상황에 강한 스트레스를 받습니다.",
+                    "<strong>다소 경직된 소통법:</strong> 타인의 감정적 호소보다 논리와 이성을 들이대 상처를 주기 쉽습니다.",
+                    "<strong>지나친 독점적 수용:</strong> 남에게 일을 맡기지 못하고 스스로 과적하여 정신적 소모가 큽니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 변동 가능성을 삶의 자연스러운 상수로 인정하고, <strong>'Plan B'</strong>를 유연하게 열어두는 태도가 절실합니다.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 갈등 상황에서 타인의 논리적 오류를 먼저 파헤치기보다 <strong>'수고했고 속상했겠다'</strong>라는 감정 언어를 의도적으로 연습하세요.</p>"
+                ],
+                careers: ["회계사 및 금융 분석가", "시스템 엔지니어 / 개발자", "행정 및 준법 준수 전문가"],
+                compBest: "ESFP / ESTP",
+                compWorst: "ENFP / INFP"
+            },
+            ISFJ: {
+                emoji: "🐹",
+                subTitle: "용기 있는 수호자",
+                tagline: "헌신과 온기, 보이지 않는 곳을 밝히는 등불",
+                desc: "타인의 정서적 안정을 세심하게 돌보며, 자신이 소속된 관계망을 소중하게 보존하고 보호하는 조용한 수호자입니다.",
+                pros: [
+                    "<strong>사려 깊은 경청과 관찰력:</strong> 남이 흘린 소소한 기호나 특징을 놓치지 않고 챙기는 디테일 챔피언입니다.",
+                    "<strong>안정적인 조화 추구:</strong> 소란을 배제하고 팀 안의 화합과 공생 관계를 조용하게 이끌어 냅니다.",
+                    "<strong>정밀하고 실질적인 봉사:</strong> 구체적이고 현실적인 가이드라인을 바탕으로 타인에게 실질적인 도움을 제공합니다."
+                ],
+                cons: [
+                    "<strong>자기주장 피력의 결여:</strong> 거절을 극도로 힘들어해 타인의 부조리한 업무 과부하를 묵묵히 다 떠안습니다.",
+                    "<strong>서운함의 내면적 화약고:</strong> 서운한 감정을 드러내지 않고 차곡차곡 쌓아두다 한순간에 관계를 차갑게 단절해 버립니다.",
+                    "<strong>보수적 변화 거부:</strong> 안정적인 기존의 전통이나 익숙한 루틴을 바꿀 때 과도한 심리적 위협감을 느낍니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> <strong>'NO'</strong>라고 말하는 것은 이기적인 행동이 아닌, 지속 가능한 나를 지키기 위한 건강한 경계선 선언임을 이해하세요.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 서운한 감정이 느껴진 그 타이밍에 온화한 화법으로 즉각 감정을 가볍게 표현하여 내적 화병을 사전에 방지하세요.</p>"
+                ],
+                careers: ["의료 및 보건 복지직", "고객 성공(CS) 스페셜리스트", "교육 및 아동 발달 전문가"],
+                compBest: "ESTP / ESFP",
+                compWorst: "ENTP / INTP"
+            },
+            INFJ: {
+                emoji: "🦉",
+                subTitle: "선의의 옹호자",
+                tagline: "깊은 통찰과 직관, 이상적 세상을 그리는 예언가",
+                desc: "강한 영적 직관과 도덕적 나침반을 소유하여, 인류가 나아가야 할 깊은 이상과 내면의 가치를 구현하려는 숭고한 영혼입니다.",
+                pros: [
+                    "<strong>남다른 통찰력:</strong> 단순한 현상 너머 인간 본질의 의도나 사건 이면의 메커니즘을 꿰뚫어 봅니다.",
+                    "<strong>강력한 신념 지향:</strong> 확고한 가치관과 이상주의를 바탕으로 타인에게 깊은 울림과 동기부여를 심어줍니다.",
+                    "<strong>섬세한 공감과 배려:</strong> 깊고 깊은 정서적 수용과 차원 높은 조언 능력으로 상처받은 마음을 치유합니다."
+                ],
+                cons: [
+                    "<strong>스스로 파놓은 완벽주의 수렁:</strong> 본인이 설정한 지나치게 고차원적인 도덕 표준에 짓눌려 자책과 무력감을 겪기 쉽습니다.",
+                    "<strong>냉혹한 슬라이딩 도어 손절:</strong> 내면의 가이드라인을 침범한 상대를 조용히 영구 격리시키는 극단적 회피 성향이 있습니다.",
+                    "<strong>정신적 번아웃 과노출:</strong> 과도한 상상과 인간 본질에 대한 집착으로 현실 감각을 잃고 신경이 금방 피로해집니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 현실의 타인은 완벽하지 않은 모순투성이 존재임을 연민 어린 눈으로 인정하고, 스스로의 기대를 한 단계 낮춰보세요.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 공상과 사색에 빠지는 즉시 <strong>'가벼운 산책이나 청소'</strong> 등 신체 감각을 깨워주는 그라운딩 연습으로 머리를 비우세요.</p>"
+                ],
+                careers: ["심리 상담가 및 정신 분석학자", "컨텐츠 에디터 및 소설 작가", "조직 개발 및 비전 전략가"],
+                compBest: "ENFP / ENTP",
+                compWorst: "ESTP / ESFP"
+            },
+            INTJ: {
+                emoji: "🦅",
+                subTitle: "용의주도한 전략가",
+                tagline: "거시적 구조 설계, 모든 변수를 장악하는 체스 마스터",
+                desc: "독립적이고 거대한 지적 야망을 가졌으며, 시스템의 결함이나 미래 트렌드를 냉철하게 설계하여 최적화하는 전략적 사상가입니다.",
+                pros: [
+                    "<strong>거시적인 입체적 지성:</strong> 아주 방대하고 복잡한 구조도 일목요연한 아키텍처로 단순화하는 통찰력이 있습니다.",
+                    "<strong>타협 없는 독립성:</strong> 남들의 무비판적 동의를 조롱하듯 팩트와 능력을 기반으로 자수성가형 성취를 이뤄냅니다.",
+                    "<strong>강력한 실행과 로드맵:</strong> 장기적인 비전을 현실의 구체적인 목표로 역산하여 저돌적으로 쟁취합니다."
+                ],
+                cons: [
+                    "<strong>소외감을 유발하는 오만함:</strong> 자신보다 비효율적이거나 이성이 떨어지는 상대를 쉽게 하찮게 여기며 겉으로 드러냅니다.",
+                    "<strong>감정 공감 기능의 정지:</strong> 상대의 슬픔을 문제 해결 지적질로 종결하려 하여 정서적 괴리감을 형성합니다.",
+                    "<strong>고집스러운 과잉 최적화:</strong> 매끄럽게 흘러가고 있는 시스템도 지나치게 완벽히 고치려다 내부 동료들을 질식시킵니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 때로는 <strong>'비효율적인 우회와 쓸모없는 유치함'</strong>이 위대한 창의성과 유대의 불씨가 됨을 영리하게 수용하세요.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 비즈니스 밖 소중한 대화에서는 논박하고 가르치려 들지 말고, <strong>'그랬구나'</strong>라는 언어를 마법처럼 외우고 발언해 보세요.</p>"
+                ],
+                careers: ["시스템 아키텍트 및 수석 개발자", "경영 컨설턴트 및 투자 분석가", "학술 연구원 및 기술 정책 전문가"],
+                compBest: "ENTP / ENFP",
+                compWorst: "ESFP / ESTP"
+            },
+            ISTP: {
+                emoji: "🐯",
+                subTitle: "만능 재주꾼",
+                tagline: "절대적인 침착함, 위기에 가동되는 효율적 사냥꾼",
+                desc: "말을 아끼며 관찰하다가 결정적 위기 타이밍에 극도로 기민하고 실용적인 신체 능력과 도구 제어력을 뽐내는 효율주의 모험가입니다.",
+                pros: [
+                    "<strong>탁월한 위기 대처력:</strong> 갑작스러운 돌발 사고나 서버 다운 상황에서도 패닉에 빠지지 않고 가장 빨리 정상화합니다.",
+                    "<strong>정밀한 기계적 지각:</strong> 물리적 실체나 코딩 구조를 직접 조립하고 뜯어보며 직관적으로 원리를 분석해 냅니다.",
+                    "<strong>미니멀리즘 인생관:</strong> 불필요한 감정 소모나 과장에 에너지를 낭비하지 않는 평화로운 쿨함을 보입니다."
+                ],
+                cons: [
+                    "<strong>인간관계 잠수왕:</strong> 외부 연락이나 의미 없는 일상적 스몰토크를 귀찮아해 동료나 연인을 강한 불안에 빠뜨립니다.",
+                    "<strong>단기적인 도파민 의존성:</strong> 긴 호흡의 계획이나 꾸준한 노력보다 자극적이고 도발적인 즉각적 도전에 에너지가 쏠립니다.",
+                    "<strong>냉소적인 방관주의:</strong> 내 관심 바깥의 타인 고통이나 조직의 공적 비전에 놀랍도록 무관심합니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 지속 가능한 관계 유지를 위해 최소한의 연락 주기나 생존 신고를 <strong>'의무 루틴'</strong>으로 스케줄링해 놓으세요.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 상대방이 긴 고백을 할 때 영혼 없는 기계식 리액션 대신, <strong>'상대의 마지막 문장을 똑같이 한 번 더 따라 읽기'</strong> 기술을 도입하세요.</p>"
+                ],
+                careers: ["소프트웨어 및 하드웨어 디버거", "응급 구조 대원 및 파일럿", "크래프트 하이엔드 엔지니어"],
+                compBest: "ESFJ / ESTJ",
+                compWorst: "ENFJ / INFJ"
+            },
+            ISFP: {
+                emoji: "🐱",
+                subTitle: "호기심 많은 예술가",
+                tagline: "따스한 감성, 유연한 자유를 품은 고양이",
+                desc: "타인과의 갈등을 극도로 기피하는 따뜻한 마음씨를 지녔으며, 감성적인 공간이나 미학적 일상에서 평화를 누리는 음유시인입니다.",
+                pros: [
+                    "<strong>탁월한 미적 수용력:</strong> 색채, 음악, 공간의 미묘한 무드를 동물적인 감각으로 포착하고 향유합니다.",
+                    "<strong>무소유의 따뜻한 수용:</strong> 선입견이나 편견이 전혀 없으며, 타인의 다름을 있는 그대로 오롯이 품어줍니다.",
+                    "<strong>갈등 중재와 평화주의:</strong> 주변인들의 날카로운 대립 속에서 부드럽고 무해한 존재감으로 충격을 흡수합니다."
+                ],
+                cons: [
+                    "<strong>파괴적인 미루기 습관:</strong> 중요한 일정이나 과제가 닥쳐와도 <strong>'침대 위 이불 속'</strong>에서 회피하는 극한의 유예가 있습니다.",
+                    "<strong>상처의 내적 누수:</strong> 비판을 들으면 심장이 내려앉는 상처를 받으면서도 표현하지 못해 건강이 나빠지기 쉽습니다.",
+                    "<strong>장기 비전의 미비:</strong> 당장의 오늘 저녁을 즐기느라 다가올 1년 뒤, 10년 뒤의 미래 가설을 극도로 기피합니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 미루기는 불안을 더 고조시킬 뿐입니다. 무언가 해야 한다면 생각하지 말고 그냥 <strong>'5초 룰(5,4,3,2,1 시작)'</strong>을 적용하세요.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 비판적인 목소리는 나를 거부하는 게 아닌 <strong>'개선 대상 파일에 대한 수정 의견'</strong>일 뿐임을 자아와 완벽히 분리하세요.</p>"
+                ],
+                careers: ["UI/UX 디자이너 및 미학 아티스트", "조경가 및 반려동물 스페셜리스트", "패션 및 인테리어 기획자"],
+                compBest: "ESTJ / ENTJ",
+                compWorst: "ENFJ / INFJ"
+            },
+            INFP: {
+                emoji: "🐰",
+                subTitle: "열정적인 중재자",
+                tagline: "순수한 자아 추구, 별빛을 쫓는 방랑가",
+                desc: "세상의 타협되지 않는 가치와 깊은 진정성을 숭상하며, 마음속 심오한 감정과 꿈을 문학적으로 노래하는 몽상가입니다.",
+                pros: [
+                    "<strong>풍부하고 정교한 내면 세계:</strong> 인간 정서의 우주적 스펙트럼을 자아로 소화하여 경이로운 창작의 씨앗을 만듭니다.",
+                    "<strong>깊이 있는 힐러형 공감:</strong> 상대의 숨겨진 슬픔이나 고통마저 아무런 조건 없이 순수한 눈빛으로 연대해 줍니다.",
+                    "<strong>흔들리지 않는 진정성:</strong> 물질적 성공이나 외부 압력보다 자신의 가치 주파수에 부합하는 진실된 길만 고수합니다."
+                ],
+                cons: [
+                    "<strong>과도한 유리멘탈 감정과입:</strong> 사소한 타인의 가벼운 워딩조차 '나에 대한 총체적 부정'으로 심대하게 확대 해석합니다.",
+                    "<strong>현실 실행 및 벼락치기:</strong> 추상적이고 거대한 아이디어는 찬란하지만, 그것을 실현할 디테일한 실행 동력이 전무하여 흐지부지됩니다.",
+                    "<strong>자기 연민과 폐쇄성:</strong> 우울하거나 좌절하면 자물쇠를 걸어 잠그고 혼자만의 망상 속으로 꼭꼭 숨어 소통이 두절됩니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 아이디어를 실천할 때는 가벼운 낙서 수준일지라도 <strong>'정해진 데드라인 안에 거친 초안(Raw Draft) 던지기'</strong> 습관을 훈련하세요.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 타인의 차가운 지적이나 무뚝뚝한 표정은 대부분 나를 향한 악의가 아니라, 단지 <strong>'그의 당일 컨디션 불량'</strong> 때문임을 알아채세요.</p>"
+                ],
+                careers: ["카피라이터 및 소설/웹툰 작가", "미술/심리 치료사 및 NGO 활동가", "브랜드 스토리텔러 및 커뮤니티 매니저"],
+                compBest: "ENTJ / INTJ",
+                compWorst: "ESTJ / ISTJ"
+            },
+            INTP: {
+                emoji: "🧠",
+                subTitle: "논리적인 사색가",
+                tagline: "순수 이론의 추구, 지식과 우주를 해체하는 분석기",
+                desc: "타협 없는 지적 호기심과 분석력으로 우주의 패턴, 사물의 원리, 논리적 가설의 일관성을 끊임없이 해부하는 사색가입니다.",
+                pros: [
+                    "<strong>비교 불가의 분석 기하학:</strong> 어떤 오류나 편견도 논리적 검증을 거치기 전엔 살아남지 못하게 하는 팩트 사냥개입니다.",
+                    "<strong>창의적인 아이디어 폭포:</strong> 완전히 다른 카테고리의 팩트들을 엮어 세상에 없던 고차원적인 패러다임을 제안합니다.",
+                    "<strong>수평적이고 유연한 지성:</strong> 감정적 자존심이 없어, 자신의 오류가 증명된다면 즉시 이를 철회하고 진리를 수용합니다."
+                ],
+                cons: [
+                    "<strong>의미 없는 설명충 기질:</strong> 일상적인 가벼운 위로와 소통이 필요한 지점에 '그 주장은 비과학적'이라며 초를 치기 일쑤입니다.",
+                    "<strong>추진력 및 끝맺음 실종:</strong> 원리를 규명하여 머릿속에서 이해가 완료되는 순간 흥미를 잃고 실무 구현은 방치해 버립니다.",
+                    "<strong>소통의 만성적 난해성:</strong> 대화가 너무 비약적이고 전문적이라 타인들과의 공감 어린 일상적 화합을 유지하기 어렵습니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 이해의 즐거움과 현실적 가치 창출은 다릅니다. 생각한 아이디어를 직접 작동하는 프로토타입으로 <strong>'완성해 내는 것'</strong>에 최고의 훈장을 부여하세요.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 친구가 하소연할 때는 <strong>'논리적 팩트 체크'</strong>의 전원 버튼을 잠시 OFF하고, 기계적으로 <strong>'진짜 화났겠네!'</strong>를 송출하세요.</p>"
+                ],
+                careers: ["알고리즘 개발자 및 AI 연구원", "이론 물리 및 과학 수사관", "시스템 보안 전문가 및 수석 고문"],
+                compBest: "ENTJ / ESTJ",
+                compWorst: "ISFJ / ESFJ"
+            },
+            ESTP: {
+                emoji: "🦊",
+                subTitle: "수완 좋은 활동가",
+                tagline: "지루할 틈 없는 행동력, 인생은 짜릿한 실전 게임",
+                desc: "순발력과 자신감이 가득하며, 복잡한 탁상공론보다 즉각적으로 발로 뛰고 부딪히며 역동적으로 문제를 타개하는 정복자입니다.",
+                pros: [
+                    "<strong>즉각적인 위기 정복:</strong> 돌발 변수가 터진 현장에서 직접 진두지휘하며 문제를 즉시 타개하는 리얼 해결사입니다.",
+                    "<strong>뛰어난 사업적 수완:</strong> 유쾌한 유머 감각과 실용적인 눈빛으로 고객을 매료시키고 비즈니스 딜을 완수합니다.",
+                    "<strong>눈부신 행동 대장:</strong> 고민할 시간에 먼저 뛰어들어 몸으로 극복하는 거침없는 개척가 기질을 뽐냅니다."
+                ],
+                cons: [
+                    "<strong>위험한 충동 조절 장애:</strong> 장기적 리스크 분석 없이 눈앞의 짜릿함이나 위험한 투자, 극단적 번지에 불쑥 가입합니다.",
+                    "<strong>뒷수습은 동료들의 몫:</strong> 시작은 기막히게 화려하게 벌여놓았으나 꼼꼼한 마무리를 지루해해 다른 이들에게 폐를 끼칩니다.",
+                    "<strong>피상적인 마음의 거칠기:</strong> 감수성 깊고 예민한 타인의 눈물이나 호소를 무시하거나 한심하게 치부하는 성향이 강합니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 모든 프로젝트에 착수하기 전, 최악의 리스크와 장기적인 자금 흐름을 최소 <strong>'3개월 단위'</strong>로 사전에 예측해 보는 연습을 강제하세요.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 나의 시원시원함이 예민한 사람들에겐 <strong>'위협과 폭력'</strong>으로 오역될 수 있으므로, 목소리 톤을 약간 낮추고 정성스레 경청해 보세요.</p>"
+                ],
+                careers: ["창업가 및 영업 매니저", "위기 대응 컨설턴트 및 마케팅 디렉터", "투자 딜러 및 벤처 캐피탈리스트"],
+                compBest: "ISFJ / ISTJ",
+                compWorst: "INFJ / ENFJ"
+            },
+            ESFP: {
+                emoji: "🦁",
+                subTitle: "자유로운 영혼의 연예인",
+                tagline: "현재를 불태우는 에너지, 매 순간 인생의 주인공",
+                desc: "타인과의 상호작용에서 뿜어져 나오는 유쾌한 활력과 즉흥성으로 어두운 팀의 공기를 단숨에 잔치판으로 리모델링하는 인싸입니다.",
+                pros: [
+                    "<strong>천부적인 무대 지배력:</strong> 특유의 따뜻하고 사교적인 말솜씨로 어떤 낯선 집단도 5분 만에 친구로 승화시킵니다.",
+                    "<strong>풍부한 오감 활용:</strong> 매력적인 패션 센스, 맛있는 미식 감각, 트렌디한 공간 인지력이 남달리 감각적으로 뛰어납니다.",
+                    "<strong>조건 없는 온정주의:</strong> 타인의 즉각적인 필요나 슬픈 소식을 마주하면 지체 없이 현실적 지원을 아끼지 않습니다."
+                ],
+                cons: [
+                    "<strong>텅 빈 지갑과 소비 광풍:</strong> 현재의 행복과 지인들과의 모임 비용을 기분 내며 결제하다 카드 한도가 금방 고갈됩니다.",
+                    "<strong>진지하고 무거운 대화 회피:</strong> 문제의 근원이나 갈등을 파고드는 심각한 면담을 피하고 농담으로 얼버무리려 도망칩니다.",
+                    "<strong>고도의 집중력 부재:</strong> 장기적인 독서, 지루한 수치 정합성 분석 시 몸을 비틀며 극심한 집중력 가뭄에 노출됩니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 소비 요정의 마법에서 벗어나기 위해 급여의 일정 비율은 아예 인출이 원천 봉쇄되는 <strong>'적금/연금'</strong>으로 우선 강제 공제해 놓으세요.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 진지한 비판이나 관계적 대화를 피하면 결국 더 큰 오해와 갈등의 쓰나미로 돌아옵니다. 가만히 앉아 깊이 있는 목소리를 경청하세요.</p>"
+                ],
+                careers: ["이벤트 플래너 및 홍보 디렉터", "레저 및 여행 콘텐츠 크리에이터", "메디케어 서비스 및 심리 레크리에이션"],
+                compBest: "ISTJ / ISFJ",
+                compWorst: "INTJ / INFJ"
+            },
+            ENFP: {
+                emoji: "🐶",
+                subTitle: "재기발랄한 활동가",
+                tagline: "무한한 가능성 스캔, 세상에 영감을 불어넣는 골든 리트리버",
+                desc: "풍부한 상상력과 사람에 대한 깊은 애정으로 언제나 번뜩이는 영감을 나누며, 세상을 축제이자 무한한 성장의 장으로 만드는 에너지 뱅크입니다.",
+                pros: [
+                    "<strong>우주급 친화력과 매력:</strong> 독창적인 대화 방식과 매력적인 공감 피드백으로 타인을 매료시키고 마음을 순식간에 열게 만듭니다.",
+                    "<strong>유연하고 독창적인 발상:</strong> 어제와 같은 루틴은 거부한다! 모든 일상과 프로젝트에 새롭고 힙한 기획의 불씨를 공급합니다.",
+                    "<strong>열정적인 지지자:</strong> 타인이 가진 잠재력을 나보다 더 깊이 신뢰하고 뜨겁게 지지해 주는 성장의 구원 투수입니다."
+                ],
+                cons: [
+                    "<strong>시작 중독자 & 뒷수습 방치:</strong> 흥미로운 프로젝트를 10개 벌려놓고, 실제로 완결하여 배포한 것은 단 1개도 없는 추진의 무덤입니다.",
+                    "<strong>심각한 감정 롤러코스터:</strong> 겉으로는 완벽한 리트리버이지만, 속은 사소한 눈치와 관계적 피드백에 피를 흘리며 우울에 잠깁니다.",
+                    "<strong>질서와 통제의 알레르기:</strong> 정형화된 보고서 양식, 정해진 출근 시간, 반복되는 엑셀 데이터 입력을 끔찍한 감옥처럼 느낍니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 일을 시작할 때 <strong>'끝맺음 담당 메이트(J 성향 동료)'</strong>와 반드시 한 팀을 이루거나, 완성 전엔 신규 프로젝트 착수를 금지하는 원칙을 세우세요.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 타인의 일시적인 무표정이나 단호함은 나를 향한 공격이 아닌, 단지 그의 인생 속 <strong>'사소한 처리 업무'</strong> 중 하나일 뿐임을 인지하세요.</p>"
+                ],
+                careers: ["크리에이티브 디렉터 및 브랜드 기획", "엔터테인먼트 크리에이터 및 방송 PD", "퍼스널 커리어 코치 및 조직 활성화 전문가"],
+                compBest: "INFJ / INTJ",
+                compWorst: "ISTJ / ISFJ"
+            },
+            ENTP: {
+                emoji: "🦄",
+                subTitle: "뜨거운 논쟁을 즐기는 변론가",
+                tagline: "프레임 브레이커, 상식을 뒤흔드는 창조적 악마의 대변인",
+                desc: "두뇌 회전이 혜성처럼 빠르고 지적 도전 정신이 남다르며, 고착화된 관행이나 권위를 통쾌한 말발과 반박으로 뒤흔드는 천재적 도전자입니다.",
+                pros: [
+                    "<strong>천재적인 브레인스토밍:</strong> 세상 모두가 'YES'라고 할 때 본질을 꿰뚫는 강력하고 힙한 'NO'를 던지는 혁신가입니다.",
+                    "<strong>우주 최강의 말발과 순발력:</strong> 어떤 압박 면접이나 급박한 토론 상황도 유쾌하고 예리한 즉흥 논리로 제압합니다.",
+                    "<strong>틀에 박히지 않은 개척력:</strong> 고정관념의 룰을 깨버리고 완전히 새롭고 효율적인 비즈니스 판을 깔아버립니다."
+                ],
+                cons: [
+                    "<strong>피로한 프로 반박러 기질:</strong> 일상 대화나 애인과의 통화마저 끝내 말꼬리를 잡고 토론으로 전환시켜 사람들의 진을 완전히 빼놓습니다.",
+                    "<strong>끈기 부족, 지루함과의 사투:</strong> 개념의 기틀을 깨는 상상 단계만 신나고, 그것을 지루하게 다듬어 마무리하는 실무를 방치해 버립니다.",
+                    "<strong>권위와 가이드라인 조롱:</strong> 조직의 엄격한 상하 위계나 규율을 불필요한 고물로 취급하여 미움을 받기 쉽습니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 말로만 이뤄지는 파격적인 아이디어는 타인에게 사기처럼 보입니다. 단 하나라도 작동하는 <strong>'최소 기능 제품(MVP)'</strong>으로 출시해 결과를 입증하세요.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 토론에서 이기는 것보다 소중한 사람의 기분을 지키는 것이 궁극적인 관계 전략에서 <strong>'압도적 승리'</strong>임을 지성으로 자각하세요.</p>"
+                ],
+                careers: ["신규 비즈니스 인큐베이터", "벤처 컨설턴트 및 정치/법률 미디어 전문가", "연구 및 R&D 전략 특허 전문가"],
+                compBest: "INFJ / INTJ",
+                compWorst: "ISFJ / ESFJ"
+            },
+            ESTJ: {
+                emoji: "🐻",
+                subTitle: "엄격한 관리자",
+                tagline: "완벽한 질서 정렬, 목표를 초토화하는 철인 지휘관",
+                desc: "강력한 현실적 리더십과 팩트 중심의 실행력으로, 복잡한 프로젝트와 조직을 일사불란한 체계로 완벽 지휘하는 장군형 리더입니다.",
+                pros: [
+                    "<strong>결과 중심의 저돌적 추진:</strong> 계획이 도출되면 어떤 외부 잡음도 차단하고 완벽하게 기한 안에 골인해 내는 야성적 동력원입니다.",
+                    "<strong>정교한 조직 관리력:</strong> 누가 어떤 리소스를 언제까지 배포해야 하는지 복잡한 협동 전선을 칼같이 배치합니다.",
+                    "<strong>흔들림 없는 신용과 원칙:</strong> 정직과 도덕, 업무적 책임감을 삶의 최고 훈장으로 여겨 든든한 신뢰를 보장합니다."
+                ],
+                cons: [
+                    "<strong>지옥에서 온 피도 눈물도 없는 팩폭:</strong> 정서적으로 지쳐 우는 팀원에게 '그래서 네 핵심 과제 미달 원인이 뭐냐'는 팩폭을 투척합니다.",
+                    "<strong>계획 변경 시 분노 조절 장애:</strong> 미리 설정해 놓은 타임라인이 비효율이나 돌발 사고로 지체되면 극도의 짜증을 표출합니다.",
+                    "<strong>다소 강압적이고 독단적 통제:</strong> 자신의 검증된 방식만 참이라 우기며 부하 직원이나 주변을 내 규격 안에 가두려 듭니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 때로는 비정량적인 감정 케어가 직원들의 생산성을 극대화하는 최고의 <strong>'비즈니스 레버리지'</strong>임을 계산에 넣으세요.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 회의 시작 전 최소 <strong>'5분간 스몰 토크'</strong>로 사람들의 컨디션을 다정하게 챙기는 것을 공식 가이드라인으로 본인에게 부여하세요.</p>"
+                ],
+                careers: ["비즈니스 총괄 COO 및 최고 관리자", "경찰 및 군 간부 / 준법 담당관", "프로젝트 관리 수석(PM) 및 생산 관리자"],
+                compBest: "ISTP / ISFP",
+                compWorst: "INFP / ENFP"
+            },
+            ESFJ: {
+                emoji: "🦌",
+                subTitle: "사교적인 외교관",
+                tagline: "마당발의 따뜻함, 모두를 엮어주는 친절한 집사",
+                desc: "친절함과 사교성이 뼛속까지 박혀있으며, 집단의 조화와 풍성한 관계망을 유기적인 온정과 서포트로 보좌하는 친화주의 관리자입니다.",
+                pros: [
+                    "<strong>극상의 케어 능력:</strong> 집단 안의 소외된 자, 우울한 자를 가장 먼저 낚아채어 따뜻한 파티의 중심으로 이끄는 천사입니다.",
+                    "<strong>완벽한 실천가 및 플래너:</strong> 사교 모임이나 실무 과제 단계에서 모두가 편안할 맛집, 디테일한 타임라인을 빈틈없이 기획합니다.",
+                    "<strong>두터운 사회적 신용:</strong> 예의가 바르고 다른 사람을 깊이 공경하여 누구에게나 호감형 인물 1순위로 등극합니다."
+                ],
+                cons: [
+                    "<strong>남의 이목에 질식하는 삶:</strong> 타인의 사소한 시선, 소문, 미지근한 리액션에 심장이 벌렁거리고 밤잠을 설치며 괴로워합니다.",
+                    "<strong>인정 욕구의 만성 갈증:</strong> 내가 이만큼 헌신하고 서포트해 줬는데 그만큼의 보상 찬사나 메아리가 없으면 혼자 극심한 서운함을 느낍니다.",
+                    "<strong>변화와 비판 수렴 차단:</strong> 갈등을 회피하기 위해 기존의 보편적 가치만 고수하여 혁신적이거나 낯선 제안을 밀어냅니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 타인의 칭찬과 평가에 내 존재의 가치를 매달지 마세요. 내면의 단단한 자존감을 위한 <strong>'나 혼자만의 시간'</strong>을 확보해야 합니다.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 상대의 거절은 나라는 인간에 대한 거부가 아니라, 단지 <strong>'그의 당일 가용 스케줄 한계'</strong> 때문임을 이성적으로 인식하세요.</p>"
+                ],
+                careers: ["인사(HR) 전문가 및 조직 화합 총괄", "초·중등 교육자 및 보건 서비스 디렉터", "홍보 마케터 및 고위 고객 서비스 매니저"],
+                compBest: "ISFP / ISTP",
+                compWorst: "INTP / ENTP"
+            },
+            ENFJ: {
+                emoji: "🦚",
+                subTitle: "정의로운 천하 통일 리더",
+                tagline: "감화와 선동의 마법사, 세상을 구원하는 정열적 영웅",
+                desc: "타인의 성장을 진심으로 갈망하며, 뛰어난 웅변 능력과 강력한 카리스마적 리더십으로 사람들을 선한 가치 아래로 결집시키는 리더입니다.",
+                pros: [
+                    "<strong>압도적인 감화적 리더십:</strong> 사람들의 영혼에 불을 지르는 유려한 말솜씨와 깊은 진정성으로 큰 스케일의 혁신 운동을 주도합니다.",
+                    "<strong>눈부신 공감과 서포트:</strong> 소중한 동료와 주변 사람들이 가진 최고 잠재력을 끌어내어 기필코 성공하게 만드는 날개입니다.",
+                    "<strong>긍정적 공동체 지향:</strong> 어둠이나 냉소를 배제하고, 언제나 밝고 도덕적이며 열정적인 희망의 비전을 우뚝 세웁니다."
+                ],
+                cons: [
+                    "<strong>지나친 영웅 심리적 오지랖:</strong> 세상 모든 아픔과 문제를 내가 다 해결하려 들다가 정작 가장 소중한 자신의 건강을 파괴합니다.",
+                    "<strong>배신감에 약한 심장:</strong> 믿고 이끌어주던 동료가 나의 통제를 벗어나거나 다른 길로 가면 극심한 배신감과 우울에 잠깁니다.",
+                    "<strong>감정 과몰입과 맹신:</strong> 팩트의 엄연한 경고음을 감정적 연대나 비현실적 믿음으로 덮어버려 투자나 비즈니스에서 뼈아픈 실책을 겪습니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 타인의 성장은 그 자신의 주체적 몫입니다. 때로는 그가 실패하도록 <strong>'개입을 끄고 조용히 뒤로 물러서는 법'</strong>을 반드시 배우세요.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 비판 의견이 들어오면 나를 향한 공격으로 듣지 말고, 단순히 <strong>'시스템 업그레이드를 위한 디버깅 팩트 정보'</strong>로 차갑게 수렴하세요.</p>"
+                ],
+                careers: ["브랜드 가치 지향 창업자 및 대표이사", "글로벌 비영리단체 디렉터 및 정치가", "조직 리더십 개발 코치 및 강연가"],
+                compBest: "INFP / ISFP",
+                compWorst: "ISTP / ESTP"
+            },
+            ENTJ: {
+                emoji: "🦁",
+                subTitle: "대담한 지도자",
+                tagline: "미래 비즈니스 정복, 완벽한 전략으로 왕좌에 오르는 CEO",
+                desc: "강인한 의지력, 냉철한 논리성, 그리고 거대한 장기 비전을 결합하여 거친 시장에서 마침내 정상을 정복하는 비즈니스 지휘관입니다.",
+                pros: [
+                    "<strong>거침없는 추진력과 의지:</strong> 불가능해 보이는 거대한 장벽이나 마감 시한도 수단과 방법을 가리지 않고 뚫어내는 파괴력이 있습니다.",
+                    "<strong>장기적인 비즈니스 혜안:</strong> 시장의 흐름과 타겟을 영리하게 선점하여 강력한 정밀 로드맵을 주도적으로 직조해 냅니다.",
+                    "<strong>유능한 조직 장악력:</strong> 냉혹하고 유능한 지적 지휘로 모든 구성원의 생산성을 임계점까지 유도합니다."
+                ],
+                cons: [
+                    "<strong>인간적 온정이 결여된 독재자:</strong> 실력이 미달이거나 업무가 지체되는 하위 직원을 차갑고 혹독하게 난도질해 퇴사 러시를 만듭니다.",
+                    "<strong>자존심 지상 최강:</strong> 자신이 틀렸음을 인정하는 상황을 끔찍하게 수치스러워해 팩트가 나와도 억지 논리로 깔아뭉개려 듭니다.",
+                    "<strong>일 중독과 가정 소홀:</strong> 일과 성공만이 존재의 이유가 되어 소중한 사적인 인간관계와 가정을 차갑게 소외시킵니다."
+                ],
+                growth: [
+                    "<p class='mb-2'>📍 <strong>성장 팁:</strong> 비즈니스 현장 밖에서는 지위와 능력을 내려놓으세요. 아무 조건 없는 <strong>'나약함과 멍 때림'</strong>을 삶의 완충지대로 장착해야 폭발을 막습니다.</p>",
+                    "<p>📍 <strong>정서 보완:</strong> 지인이나 직원이 실수를 했을 때 추궁하는 <strong>'왜 그랬어?'</strong> 화법 대신, 복구에 에너지를 모으는 <strong>'어떻게 도울까?'</strong> 화법으로 교정하세요.</p>"
+                ],
+                careers: ["투자 유치 및 연쇄 창업가", "고위 경영 컨설턴트 및 M&A 전문가", "글로벌 제품 총괄 디렉터"],
+                compBest: "INFP / INTP",
+                compWorst: "ISFP / ESFP"
+            }
         };
 
-        let currentIdx = 0;
-        let score = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+        // --- Core Application State Engine ---
+        let currentQuestionIndex = 0;
+        let userSelectedAnswers = []; // Stack for backing track back-end
 
-        function startTest() {
-            document.getElementById("start-page").classList.remove("active");
-            document.getElementById("question-page").classList.add("active");
-            showQuestion();
+        // Initiate the Entire App State
+        function initiateTest() {
+            document.getElementById("welcome-screen").classList.add("hidden");
+            document.getElementById("test-screen").classList.remove("hidden");
+            currentQuestionIndex = 0;
+            userSelectedAnswers = [];
+            document.getElementById("btn-back-step").disabled = true;
+            renderCurrentQuestion();
         }
 
-        function showQuestion() {
-            if (currentIdx >= questions.length) {
-                showResult();
+        // Render Current Question Elements
+        function renderCurrentQuestion() {
+            if (currentQuestionIndex >= testDatabase.length) {
+                processAndCalculateResult();
                 return;
             }
-            // 진행도 바 업데이트
-            const progress = (currentIdx / questions.length) * 100;
-            document.getElementById("progress").style.width = progress + "%";
 
-            // 질문 및 답변 세팅
-            const currentQ = questions[currentIdx];
-            document.getElementById("question-text").innerText = `Q${currentIdx + 1}. ${currentQ.q}`;
-            document.getElementById("answer-a").innerText = currentQ.a;
-            document.getElementById("answer-b").innerText = currentQ.b;
+            const currentObj = testDatabase[currentQuestionIndex];
+            
+            // Progress Update
+            const total = testDatabase.length;
+            const progressRatio = (currentQuestionIndex / total) * 100;
+            document.getElementById("test-progress-bar").style.width = progressRatio + "%";
+            document.getElementById("progress-indicator").innerText = `Question ${String(currentQuestionIndex + 1).padStart(2, '0')} of ${total}`;
+            document.getElementById("progress-percent").innerText = `${Math.round(progressRatio)}% Completed`;
+
+            // Question Category Tag Update
+            const categoryMapping = {
+                "EI": "에너지 방향성 (E / I)",
+                "SN": "인식 정보 차원 (S / N)",
+                "TF": "판단 기준 차원 (T / F)",
+                "JP": "대처 및 계획 성향 (J / P)"
+            };
+            document.getElementById("question-category").innerText = categoryMapping[currentObj.type] || "성격 차원 매핑";
+            
+            // Text Value Assignment
+            document.getElementById("question-title").innerText = currentObj.q;
+            document.getElementById("text-option-a").innerText = currentObj.a;
+            document.getElementById("text-option-b").innerText = currentObj.b;
+
+            // Back button control
+            document.getElementById("btn-back-step").disabled = (currentQuestionIndex === 0);
         }
 
-        function selectAnswer(choice) {
-            const currentQ = questions[currentIdx];
-            const type = currentQ.type; // "EI", "SN", "TF", "JP"
+        // Handle Next Click Option Select
+        function handleAnswerSelection(option) {
+            userSelectedAnswers.push({
+                qId: testDatabase[currentQuestionIndex].id,
+                type: testDatabase[currentQuestionIndex].type,
+                choice: option
+            });
 
-            if (choice === 'A') {
-                score[type[0]]++;
-            } else {
-                score[type[1]]++;
+            currentQuestionIndex++;
+            renderCurrentQuestion();
+        }
+
+        // Go Back Single Step
+        function revertLastStep() {
+            if (currentQuestionIndex > 0) {
+                userSelectedAnswers.pop();
+                currentQuestionIndex--;
+                renderCurrentQuestion();
             }
-
-            currentIdx++;
-            showQuestion();
         }
 
-        function showResult() {
-            document.getElementById("question-page").classList.remove("active");
-            document.getElementById("result-page").classList.add("active");
+        // Process final calculations with smooth loading trigger
+        function processAndCalculateResult() {
+            document.getElementById("test-screen").classList.add("hidden");
+            document.getElementById("loading-screen").classList.remove("hidden");
 
-            // 점수 계산하여 MBTI 문자열 조합
-            let mbti = "";
-            mbti += (score.E >= score.I) ? "E" : "I";
-            mbti += (score.S >= score.N) ? "S" : "N";
-            mbti += (score.T >= score.F) ? "T" : "F";
-            mbti += (score.J >= score.P) ? "J" : "P";
+            // Multi-step analytical loading simulation (UX polish)
+            const tips = [
+                "에너지 방향성 벡터 결합 매핑 연산 중...",
+                "인식 인지 알고리즘 로직 신뢰도 테스트 중...",
+                "종합 성격 클러스터링 및 성장 보완 전략 가동 중...",
+                "리포팅 데이터셋 렌더링 완료 임박!"
+            ];
+            
+            let tipIndex = 0;
+            const interval = setInterval(() => {
+                if (tipIndex < tips.length) {
+                    document.getElementById("loading-tip").innerText = tips[tipIndex];
+                    tipIndex++;
+                }
+            }, 600);
 
-            const result = mbtiResults[mbti];
-
-            // 화면에 렌더링
-            document.getElementById("result-emoji").innerText = result.emoji;
-            document.getElementById("result-mbti").innerText = mbti;
-            document.getElementById("result-title").innerText = result.title;
-
-            // 장점 바인딩
-            const prosUl = document.getElementById("result-pros");
-            prosUl.innerHTML = "";
-            result.pros.forEach(pro => {
-                const li = document.createElement("li");
-                li.innerText = pro;
-                prosUl.appendChild(li);
-            });
-
-            // 단점 바인딩
-            const consUl = document.getElementById("result-cons");
-            consUl.innerHTML = "";
-            result.cons.forEach(con => {
-                const li = document.createElement("li");
-                li.innerText = con;
-                consUl.appendChild(li);
-            });
+            setTimeout(() => {
+                clearInterval(interval);
+                buildFinalReport();
+            }, 2400);
         }
 
-        function restartTest() {
-            currentIdx = 0;
-            score = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
-            document.getElementById("result-page").classList.remove("active");
-            document.getElementById("start-page").classList.add("active");
+        // Build Highly Detailed Analytical Report View
+        function buildFinalReport() {
+            // Raw Core score computation
+            let dimensions = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            let totalCounts = { EI: 0, SN: 0, TF: 0, JP: 0 };
+
+            userSelectedAnswers.forEach(answer => {
+                const dimType = answer.type; // "EI", "SN" ...
+                totalCounts[dimType]++;
+                
+                if (answer.choice === 'A') {
+                    dimensions[dimType[0]]++; // E, S, T, J
+                } else {
+                    dimensions[dimType[1]]++; // I, N, F, P
+                }
+            });
+
+            // Percent computations
+            const ePercent = Math.round((dimensions.E / totalCounts.EI) * 100);
+            const iPercent = 100 - ePercent;
+
+            const sPercent = Math.round((dimensions.S / totalCounts.SN) * 100);
+            const nPercent = 100 - sPercent;
+
+            const tPercent = Math.round((dimensions.T / totalCounts.TF) * 100);
+            const fPercent = 100 - tPercent;
+
+            const jPercent = Math.round((dimensions.J / totalCounts.JP) * 100);
+            const pPercent = 100 - jPercent;
+
+            // Compute Final Type ID Code
+            let finalType = "";
+            finalType += (ePercent >= iPercent) ? "E" : "I";
+            finalType += (sPercent >= nPercent) ? "S" : "N";
+            finalType += (tPercent >= fPercent) ? "T" : "F";
+            finalType += (jPercent >= pPercent) ? "J" : "P";
+
+            const profile = personalityReportDatabase[finalType];
+
+            // Render text overlays
+            document.getElementById("display-mbti").innerText = finalType;
+            document.getElementById("display-emoji").innerText = profile.emoji;
+            document.getElementById("display-sub-title").innerText = profile.subTitle;
+            document.getElementById("display-tagline").innerText = profile.tagline;
+            document.getElementById("display-desc").innerText = profile.desc;
+
+            // Render Charts (Width and label assignments)
+            document.getElementById("chart-e").style.width = ePercent + "%";
+            document.getElementById("chart-e").innerText = ePercent > 15 ? `E ${ePercent}%` : '';
+            document.getElementById("chart-i").style.width = iPercent + "%";
+            document.getElementById("chart-i").innerText = iPercent > 15 ? `${iPercent}% I` : '';
+
+            document.getElementById("chart-s").style.width = sPercent + "%";
+            document.getElementById("chart-s").innerText = sPercent > 15 ? `S ${sPercent}%` : '';
+            document.getElementById("chart-n").style.width = nPercent + "%";
+            document.getElementById("chart-n").innerText = nPercent > 15 ? `${nPercent}% N` : '';
+
+            document.getElementById("chart-t").style.width = tPercent + "%";
+            document.getElementById("chart-t").innerText = tPercent > 15 ? `T ${tPercent}%` : '';
+            document.getElementById("chart-f").style.width = fPercent + "%";
+            document.getElementById("chart-f").innerText = fPercent > 15 ? `${fPercent}% F` : '';
+
+            document.getElementById("chart-j").style.width = jPercent + "%";
+            document.getElementById("chart-j").innerText = jPercent > 15 ? `J ${jPercent}%` : '';
+            document.getElementById("chart-p").style.width = pPercent + "%";
+            document.getElementById("chart-p").innerText = pPercent > 15 ? `${pPercent}% P` : '';
+
+            // Clean list and load Strengths
+            const prosContainer = document.getElementById("display-pros");
+            prosContainer.innerHTML = "";
+            profile.pros.forEach(proItem => {
+                const li = document.createElement("li");
+                li.className = "flex items-start gap-2.5 bg-slate-800/30 p-3 rounded-xl border border-slate-700/20";
+                li.innerHTML = `<i class="fa-solid fa-square-check text-accent-emerald text-base mt-0.5 shrink-0"></i> <span>${proItem}</span>`;
+                prosContainer.appendChild(li);
+            });
+
+            // Clean list and load Weaknesses
+            const consContainer = document.getElementById("display-cons");
+            consContainer.innerHTML = "";
+            profile.cons.forEach(conItem => {
+                const li = document.createElement("li");
+                li.className = "flex items-start gap-2.5 bg-slate-800/30 p-3 rounded-xl border border-slate-700/20";
+                li.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-accent-rose text-base mt-0.5 shrink-0"></i> <span>${conItem}</span>`;
+                consContainer.appendChild(li);
+            });
+
+            // Clean list and load Growth Strategy Tips
+            const growthContainer = document.getElementById("display-growth");
+            growthContainer.innerHTML = "";
+            profile.growth.forEach(tipItem => {
+                const div = document.createElement("div");
+                div.className = "p-4 rounded-2xl bg-slate-800/30 border border-slate-700/30";
+                div.innerHTML = tipItem;
+                growthContainer.appendChild(div);
+            });
+
+            // Careers Matching Setup
+            document.getElementById("career-1").innerText = profile.careers[0];
+            document.getElementById("career-2").innerText = profile.careers[1];
+            document.getElementById("career-3").innerText = profile.careers[2];
+
+            // Compatibility Connections
+            document.getElementById("comp-best").innerText = profile.compBest;
+            document.getElementById("comp-worst").innerText = profile.compWorst;
+
+            // Transition To Report Screen
+            document.getElementById("loading-screen").classList.add("hidden");
+            document.getElementById("result-screen").classList.remove("hidden");
+        }
+
+        // Restart entire program test workflow
+        function relaunchTest() {
+            document.getElementById("result-screen").classList.add("hidden");
+            document.getElementById("welcome-screen").classList.remove("hidden");
+            currentQuestionIndex = 0;
+            userSelectedAnswers = [];
+        }
+
+        // Simulated export to clipboard action
+        function shareTestSummary() {
+            const mbtiCode = document.getElementById("display-mbti").innerText;
+            const taglineText = document.getElementById("display-tagline").innerText;
+            const shareString = `[M-Profile Premium 분석 리포트]\n✔ 나의 MBTI 성격 아키텍처: ${mbtiCode}\n🎯 한 줄 요약: ${taglineText}\n\n지금 바로 당신만의 다차원 성격 구조를 분석해 보세요! -> mbti_official_app.html`;
+            
+            navigator.clipboard.writeText(shareString).then(() => {
+                alert("✨ 정밀 분석 요약 텍스트가 클립보드에 복사되었습니다! 친구나 단톡방에 붙여넣어 공유하세요.");
+            }).catch(err => {
+                alert("복사에 실패했습니다. 수동으로 복사해 주세요.");
+            });
         }
     </script>
 </body>
